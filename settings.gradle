@@ -1,0 +1,4 @@
+rootProject.name = 'rw-msa-multi'
+include 'rw-common'
+include 'rw-user'
+
