@@ -25,6 +25,14 @@ spring:
           uri: http://localhost:8084
           predicates:
             - Path=/api/articles/*/tags/**
+        - id: favorite
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/articles/*/favorite
+        - id: comment
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/articles/*/comments
 
 logging:
   level:

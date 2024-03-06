@@ -112,3 +112,17 @@ project(':rw-tag') {
         compileOnly project(':rw-common')
     }
 }
+
+
+project(':rw-favorite') {
+    dependencies {
+        compileOnly project(':rw-common')
+    }
+}
+
+
+project(':rw-comment') {
+    dependencies {
+        compileOnly project(':rw-common')
+    }
+}
