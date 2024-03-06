@@ -1,17 +1,22 @@
 package com.lodny.rwarticle.service;
 
 import com.lodny.rwarticle.entity.Article;
+import com.lodny.rwarticle.entity.dto.ArticleResponse;
 import com.lodny.rwarticle.entity.dto.RegisterArticleRequest;
 import com.lodny.rwarticle.mapper.ArticleMapper;
 import com.lodny.rwarticle.repository.ArticleRepository;
 import com.lodny.rwcommon.properties.JwtProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -78,15 +83,25 @@ public class ArticleService {
 
 //        articleRepository.deleteBySlug(slug);
         return articleRepository.deleteBySlugAndAuthorId(slug, loginUserId);
-    }
+    }*/
 
     public Page<ArticleResponse> getArticles(final PageRequest pageRequest, final Long loginUserId) {
-        Page<Object> objs = articleRepository.getArticles(loginUserId, pageRequest);
-        log.info("[S] getArticles() : objs={}", objs);
+//        Page<Object> objs = articleRepository.getArticles(loginUserId, pageRequest);
+        Page<Article> articlePage = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest);
+        log.info("[S] getArticles() : articlePage={}", articlePage);
 
-        return getArticleResponses(objs);
+        return getArticleResponses(articlePage);
     }
+    private Page<ArticleResponse> getArticleResponses(final Page<Article> articlePage) {
+        List<ArticleResponse> articleResponses = articlePage.getContent().stream()
+                .map(ArticleResponse::of)
+                .toList();
 
+        log.info("[S] getArticleResponses() : articleResponses={}", articleResponses);
+
+        return new PageImpl<>(articleResponses, articlePage.getPageable(), articlePage.getTotalElements());
+    }
+/*
     public Page<ArticleResponse> getArticlesByTag(final String tag,
                                                   final Long loginUserId,
                                                   final PageRequest pageRequest) {
@@ -118,14 +133,5 @@ public class ArticleService {
 
         return getArticleResponses(objs);
     }
-
-    private Page<ArticleResponse> getArticleResponses(final Page<Object> objs) {
-        List<ArticleResponse> articleResponses = objs.stream()
-                .map(obj -> ArticleResponse.of((Object[]) obj))
-                .toList();
-
-        log.info("[S] getArticleResponses() : articleResponses={}", articleResponses);
-
-        return new PageImpl<>(articleResponses, objs.getPageable(), objs.getTotalElements());
-    }*/
+*/
 }

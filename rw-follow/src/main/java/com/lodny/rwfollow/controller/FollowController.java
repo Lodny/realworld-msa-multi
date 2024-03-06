@@ -32,14 +32,14 @@ public class FollowController {
     @JwtTokenRequired
     @PostMapping("/follow")
     public ResponseEntity<?> follow(@PathVariable final String username,
-                                    @LoginUser final Map<String, String> loginInfo) {
+                                    @LoginUser final Map<String, Object> loginInfo) {
         log.info("[C] follow() : username={}", username);
         log.info("[C] follow() : loginInfo={}", loginInfo);
 
-        Long followeeId = getUserIdFromRestTemplate(username, loginInfo.get("token"));
+        Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
         log.info("[C] follow() : followeeId={}", followeeId);
 
-        long followerId = Long.parseLong(loginInfo.get("userId"));
+        long followerId = (Long)loginInfo.get("userId");
         Follow follow = followService.follow(followeeId, followerId);
         log.info("follow() : follow={}", follow);
 
@@ -52,14 +52,14 @@ public class FollowController {
     @JwtTokenRequired
     @DeleteMapping("/follow")
     public ResponseEntity<?> unfollow(@PathVariable final String username,
-                                      @LoginUser final Map<String, String> loginInfo) {
+                                      @LoginUser final Map<String, Object> loginInfo) {
         log.info("[C] unfollow() : username={}", username);
         log.info("[C] unfollow() : loginInfo={}", loginInfo);
 
-        Long followeeId = getUserIdFromRestTemplate(username, loginInfo.get("token"));
+        Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
         log.info("[C} unfollow() : followeeId={}", followeeId);
 
-        long followerId = Long.parseLong(loginInfo.get("userId"));
+        long followerId = (Long)loginInfo.get("userId");
         followService.unfollow(followeeId, followerId);
 
         WrapProfileResponse wrapProfileResponse = getProfileResponse(username);
@@ -71,14 +71,14 @@ public class FollowController {
     @JwtTokenRequired
     @GetMapping("/follow")
     public ResponseEntity<?> isFollow(@PathVariable final String username,
-                                      @LoginUser final Map<String, String> loginInfo) {
+                                      @LoginUser final Map<String, Object> loginInfo) {
         log.info("[C] isFollow() : username={}", username);
         log.info("[C] isFollow() : loginInfo={}", loginInfo);
 
-        Long followeeId = getUserIdFromRestTemplate(username, loginInfo.get("token"));
+        Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
         log.info("[C] isFollow() : followeeId={}", followeeId);
 
-        long followerId = Long.parseLong(loginInfo.get("userId"));
+        long followerId = (Long)loginInfo.get("userId");
         Boolean following = followService.isFollow(followerId, followerId);
         log.info("[C] isFollow() : following={}", following);
 

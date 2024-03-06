@@ -22,11 +22,11 @@ public class FavoriteController {
     @JwtTokenRequired
     @PostMapping("/favorite")
     public ResponseEntity<?> favorite(@PathVariable final String slug,
-                                      @LoginUser final Map<String, String> loginInfo) {
+                                      @LoginUser final Map<String, Object> loginInfo) {
         log.info("[C] favorite() : slug={}", slug);
         log.info("[C] favorite() : loginInfo={}", loginInfo);
 
-//        Long loginUserId = getUserIdFromRestTemplate(username, loginInfo.get("token"));
+//        Long loginUserId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
 //        ArticleResponse articleResponse = favoriteService.favorite(slug, loginUserId);
 //        log.info("[C] favorite() : articleResponse={}", articleResponse);
 
@@ -37,7 +37,7 @@ public class FavoriteController {
     @JwtTokenRequired
     @DeleteMapping("/favorite")
     public ResponseEntity<?> unfavorite(@PathVariable final String slug,
-                                        @LoginUser final Map<String, String> loginInfo) {
+                                        @LoginUser final Map<String, Object> loginInfo) {
         log.info("[C] unfavorite() : slug={}", slug);
         log.info("[C] unfavorite() : loginInfo={}", loginInfo);
 

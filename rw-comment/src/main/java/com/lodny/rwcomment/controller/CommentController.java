@@ -28,7 +28,7 @@ public class CommentController {
     @PostMapping("/comments")
     public ResponseEntity<?> registerComment(@PathVariable final String slug,
                                              @RequestBody final WrapRegisterCommentRequest wrapRegisterCommentRequest,
-                                             @LoginUser final Map<String, String> loginInfo) {
+                                             @LoginUser final Map<String, Object> loginInfo) {
         RegisterCommentRequest registerCommentRequest = wrapRegisterCommentRequest.comment();
         log.info("[C] registerComment() : slug={}", slug);
         log.info("[C] registerComment() : registerCommentRequest={}", registerCommentRequest);

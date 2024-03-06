@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lodny.rwarticle.entity.Article;
 import com.lodny.rwcommon.util.MapToDto.MapToDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ArticleResponse {
     @JsonIgnore
     private Long id;
@@ -32,6 +34,16 @@ public class ArticleResponse {
     private Long favoritesCount;
 
     private ProfileResponse author;
+
+    public static ArticleResponse of(final Article article) {
+        return ArticleResponse.builder()
+                .id(article.getId())
+                .slug(article.getSlug())
+                .title(article.getTitle())
+                .description(article.getDescription())
+                .body(article.getBody())
+                .build();
+    }
 
     public static ArticleResponse of(final Article article,
                                      final ProfileResponse author,
