@@ -80,27 +80,34 @@ subprojects {
 }
 
 
-project(':rw-common') { // multi-module-databse는 bootJar로 패키징 할 필요 없음
+project(':rw-common') {
     bootJar { enabled = false }
     jar { enabled = true }
 }
 
 
-project(':rw-user') { // 컴파일 시 multi-module-database 로딩
+project(':rw-user') {
     dependencies {
         compileOnly project(':rw-common')
     }
 }
 
 
-project(':rw-follow') { // 컴파일 시 multi-module-database 로딩
+project(':rw-follow') {
     dependencies {
         compileOnly project(':rw-common')
     }
 }
 
 
-project(':rw-article') { // 컴파일 시 multi-module-database 로딩
+project(':rw-article') {
+    dependencies {
+        compileOnly project(':rw-common')
+    }
+}
+
+
+project(':rw-tag') {
     dependencies {
         compileOnly project(':rw-common')
     }

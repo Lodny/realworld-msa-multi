@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/rw-article" />
             <option value="$PROJECT_DIR$/rw-common" />
             <option value="$PROJECT_DIR$/rw-follow" />
+            <option value="$PROJECT_DIR$/rw-tag" />
             <option value="$PROJECT_DIR$/rw-user" />
           </set>
         </option>

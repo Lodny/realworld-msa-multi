@@ -3,4 +3,5 @@ include 'rw-common'
 include 'rw-user'
 include 'rw-follow'
 include 'rw-article'
+include 'rw-tag'
 
