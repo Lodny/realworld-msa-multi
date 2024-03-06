@@ -21,8 +21,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtFilter4DB extends OncePerRequestFilter {
 
-    private final JwtProperty jwtProperty;
-    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
     @Override
@@ -42,7 +40,6 @@ public class JwtFilter4DB extends OncePerRequestFilter {
 
         loginInfo.put("user", foundUser);
 
-//        jwtUtil.putLoginInfo(sessionId, UserResponse.of(foundUser, token));
         filterChain.doFilter(request, response);
     }
 }
