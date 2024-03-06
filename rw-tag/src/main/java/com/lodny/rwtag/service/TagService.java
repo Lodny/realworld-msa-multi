@@ -29,8 +29,7 @@ public class TagService {
     }
 
     public List<String> getTop10Tags() {
-        return null;
-//        return articleRepository.getTop10Tags();
+        return tagRepository.getTop10Tags().stream().map(tag -> tag[0]).toList();
     }
 
     public Set<Tag> getTags(final Long articleId) {
