@@ -98,3 +98,10 @@ project(':rw-follow') { // 컴파일 시 multi-module-database 로딩
         compileOnly project(':rw-common')
     }
 }
+
+
+project(':rw-article') { // 컴파일 시 multi-module-database 로딩
+    dependencies {
+        compileOnly project(':rw-common')
+    }
+}

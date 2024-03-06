@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/rw-article" />
             <option value="$PROJECT_DIR$/rw-common" />
             <option value="$PROJECT_DIR$/rw-follow" />
             <option value="$PROJECT_DIR$/rw-user" />
