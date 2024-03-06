@@ -32,4 +32,8 @@ public class TagService {
         return null;
 //        return articleRepository.getTop10Tags();
     }
+
+    public Set<Tag> getTags(final Long articleId) {
+        return tagRepository.findAllByArticleId(articleId);
+    }
 }

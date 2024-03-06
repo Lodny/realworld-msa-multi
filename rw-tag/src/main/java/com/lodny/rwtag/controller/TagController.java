@@ -1,6 +1,7 @@
 package com.lodny.rwtag.controller;
 
 import com.lodny.rwcommon.annotation.JwtTokenRequired;
+import com.lodny.rwtag.entity.Tag;
 import com.lodny.rwtag.entity.wrapper.WrapTag10Response;
 import com.lodny.rwtag.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -29,6 +31,15 @@ public class TagController {
         int count = tagService.registerTags(articleId, tags);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(count);
+    }
+
+    @GetMapping("/articles/{articleId}/tags")
+    public ResponseEntity<?> getTags(@PathVariable final Long articleId) {
+        log.info("[C] getTags() : articleId={}", articleId);
+        Set<Tag> tags = tagService.getTags(articleId);
+        log.info("[C] getTags() : tags={}", tags);
+
+        return ResponseEntity.ok(tags.stream().map(Tag::getTag).collect(Collectors.toSet()));
     }
 
     @GetMapping("/tags")

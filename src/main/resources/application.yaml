@@ -24,7 +24,11 @@ spring:
         - id: tag
           uri: http://localhost:8084
           predicates:
-            - Path=/api/articles/*/tags/list
+            - Path=/api/articles/*/**
+#        - id: tag
+#          uri: http://localhost:8084
+#          predicates:
+#            - Path=/api/articles/*/tags
         - id: tag
           uri: http://localhost:8084
           predicates:

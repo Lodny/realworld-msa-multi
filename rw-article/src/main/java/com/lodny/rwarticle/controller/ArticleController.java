@@ -37,7 +37,7 @@ public class ArticleController {
 
         Article registeredArticle = articleService.registerArticle(
                 registerArticleRequest,
-                (long)loginInfo.get("userId"),
+                Long.parseLong((String)loginInfo.get("userId")),
                 (String)loginInfo.get("token"));
         log.info("[C] registerArticle() : registeredArticle={}", registeredArticle);
 

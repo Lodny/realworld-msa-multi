@@ -45,6 +45,13 @@ public class ArticleService {
         return savedArticle;
     }
 
+    public Page<ArticleResponse> getArticles(final PageRequest pageRequest, final Long loginUserId) {
+        Page<Article> articlePage = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest);
+        log.info("[S] getArticles() : articlePage={}", articlePage);
+
+        return getArticleResponses(articlePage);
+    }
+
     private String registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -56,6 +63,32 @@ public class ArticleService {
                 HttpMethod.POST,
                 requestEntity,
                 String.class);
+
+        return response.getBody();
+    }
+
+    private Page<ArticleResponse> getArticleResponses(final Page<Article> articlePage) {
+        List<ArticleResponse> articleResponses = articlePage.getContent().stream()
+                .map(article -> {
+                    Set<String> tags = getTagsByArticleIdWithRestTemplate(article.getId());
+                    return ArticleResponse.of(article, tags);
+                })
+                .toList();
+
+        log.info("[S] getArticleResponses() : articleResponses={}", articleResponses);
+
+        return new PageImpl<>(articleResponses, articlePage.getPageable(), articlePage.getTotalElements());
+    }
+
+    private Set<String> getTagsByArticleIdWithRestTemplate(final Long articleId) {
+        //        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+
+        ResponseEntity<Set> response = restTemplate.exchange(
+                "http://localhost:8080/api/articles/" + articleId + "/tags",
+                HttpMethod.GET,
+                new HttpEntity<String>(new HttpHeaders()),
+                Set.class);
 
         return response.getBody();
     }
@@ -73,7 +106,6 @@ public class ArticleService {
 
         return ArticleResponse.of(map);
     }*/
-
     /*public int deleteArticleBySlug(final String slug, final Long loginUserId) {
 //        Article foundArticle = getArticleBySlug(slug);
 //        if (! foundArticle.getAuthorId().equals(loginUserId))
@@ -84,23 +116,6 @@ public class ArticleService {
 //        articleRepository.deleteBySlug(slug);
         return articleRepository.deleteBySlugAndAuthorId(slug, loginUserId);
     }*/
-
-    public Page<ArticleResponse> getArticles(final PageRequest pageRequest, final Long loginUserId) {
-//        Page<Object> objs = articleRepository.getArticles(loginUserId, pageRequest);
-        Page<Article> articlePage = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest);
-        log.info("[S] getArticles() : articlePage={}", articlePage);
-
-        return getArticleResponses(articlePage);
-    }
-    private Page<ArticleResponse> getArticleResponses(final Page<Article> articlePage) {
-        List<ArticleResponse> articleResponses = articlePage.getContent().stream()
-                .map(ArticleResponse::of)
-                .toList();
-
-        log.info("[S] getArticleResponses() : articleResponses={}", articleResponses);
-
-        return new PageImpl<>(articleResponses, articlePage.getPageable(), articlePage.getTotalElements());
-    }
 /*
     public Page<ArticleResponse> getArticlesByTag(final String tag,
                                                   final Long loginUserId,

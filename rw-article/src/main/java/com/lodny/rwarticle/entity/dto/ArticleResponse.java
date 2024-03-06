@@ -35,13 +35,14 @@ public class ArticleResponse {
 
     private ProfileResponse author;
 
-    public static ArticleResponse of(final Article article) {
+    public static ArticleResponse of(final Article article, final Set<String> tagList) {
         return ArticleResponse.builder()
                 .id(article.getId())
                 .slug(article.getSlug())
                 .title(article.getTitle())
                 .description(article.getDescription())
                 .body(article.getBody())
+                .tagList(tagList)
                 .build();
     }
 
