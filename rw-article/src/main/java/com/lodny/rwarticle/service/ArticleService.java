@@ -2,6 +2,7 @@ package com.lodny.rwarticle.service;
 
 import com.lodny.rwarticle.entity.Article;
 import com.lodny.rwarticle.entity.dto.ArticleResponse;
+import com.lodny.rwarticle.entity.dto.ProfileResponse;
 import com.lodny.rwarticle.entity.dto.RegisterArticleRequest;
 import com.lodny.rwarticle.mapper.ArticleMapper;
 import com.lodny.rwarticle.repository.ArticleRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -45,11 +47,13 @@ public class ArticleService {
         return savedArticle;
     }
 
-    public Page<ArticleResponse> getArticles(final PageRequest pageRequest, final Long loginUserId) {
+    public Page<ArticleResponse> getArticles(final PageRequest pageRequest,
+                                             final Long loginUserId,
+                                             final String token) {
         Page<Article> articlePage = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest);
         log.info("[S] getArticles() : articlePage={}", articlePage);
 
-        return getArticleResponses(articlePage);
+        return getArticleResponses(articlePage, loginUserId, token);
     }
 
     private String registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
@@ -67,11 +71,12 @@ public class ArticleService {
         return response.getBody();
     }
 
-    private Page<ArticleResponse> getArticleResponses(final Page<Article> articlePage) {
+    private Page<ArticleResponse> getArticleResponses(final Page<Article> articlePage, final Long loginUserId, final String token) {
         List<ArticleResponse> articleResponses = articlePage.getContent().stream()
                 .map(article -> {
                     Set<String> tags = getTagsByArticleIdWithRestTemplate(article.getId());
-                    return ArticleResponse.of(article, tags);
+                    ProfileResponse profileResponse = getProfileByIdWithRestTemplate(article.getAuthorId(), token);
+                    return ArticleResponse.of(article, tags, profileResponse);
                 })
                 .toList();
 
@@ -89,6 +94,23 @@ public class ArticleService {
                 HttpMethod.GET,
                 new HttpEntity<String>(new HttpHeaders()),
                 Set.class);
+
+        return response.getBody();
+    }
+
+    private ProfileResponse getProfileByIdWithRestTemplate(final Long authorId, final String token) {
+        log.info("getProfileByIdWithRestTemplate() : authorId={}", authorId);
+        log.info("getProfileByIdWithRestTemplate() : token={}", token);
+
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtils.hasText(token))
+            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+
+        ResponseEntity<ProfileResponse> response = restTemplate.exchange(
+                "http://localhost:8080/api/profiles/by-id/" + authorId,
+                HttpMethod.GET,
+                new HttpEntity<String>(headers),
+                ProfileResponse.class);
 
         return response.getBody();
     }

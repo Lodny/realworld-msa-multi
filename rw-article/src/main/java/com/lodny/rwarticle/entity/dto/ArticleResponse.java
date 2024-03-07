@@ -35,7 +35,9 @@ public class ArticleResponse {
 
     private ProfileResponse author;
 
-    public static ArticleResponse of(final Article article, final Set<String> tagList) {
+    public static ArticleResponse of(final Article article,
+                                     final Set<String> tagList,
+                                     final ProfileResponse author) {
         return ArticleResponse.builder()
                 .id(article.getId())
                 .slug(article.getSlug())
@@ -43,6 +45,11 @@ public class ArticleResponse {
                 .description(article.getDescription())
                 .body(article.getBody())
                 .tagList(tagList)
+                .createdAt(article.getCreatedAt())
+                .updatedAt(article.getUpdatedAt())
+                .favorited(false)
+                .favoritesCount(0L)
+                .author(author)
                 .build();
     }
 

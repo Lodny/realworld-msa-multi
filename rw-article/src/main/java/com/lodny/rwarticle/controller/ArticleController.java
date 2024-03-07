@@ -90,12 +90,14 @@ public class ArticleController {
         final var loginUserId = loginInfo != null ? (long)loginInfo.get("userId") : -1;
         log.info("[C] getArticles() : loginUserId={}", loginUserId);
 
+        final var token = loginInfo != null ? (String)loginInfo.get("token") : "";
+
         final Page<ArticleResponse> pageArticles =
                 switch (articleParam.type()) {
 //                    case "tag"       -> articleService.getArticlesByTag(articleParam.tag(), loginUserId, pageRequest);
 //                    case "author"    -> articleService.getArticlesByAuthor(articleParam.author(), loginUserId, pageRequest);
 //                    case "favorited" -> articleService.getArticlesByFavorited(articleParam.favorited(), loginUserId, pageRequest);
-                    default          -> articleService.getArticles(pageRequest, loginUserId);
+                    default          -> articleService.getArticles(pageRequest, loginUserId, token);
                 };
         log.info("[C] getArticles() : pageArticles={}", pageArticles);
 

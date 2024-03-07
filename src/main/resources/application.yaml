@@ -13,6 +13,10 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/api/profiles/*
+        - id: user
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/profiles/by-id/*
         - id: follow
           uri: http://localhost:8082
           predicates:

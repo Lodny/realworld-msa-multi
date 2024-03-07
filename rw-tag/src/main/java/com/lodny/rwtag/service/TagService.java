@@ -17,13 +17,13 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public int registerTags(final Long articleId, final Set<String> tags) {
-        tags.forEach(tag -> tagRepository.save(new Tag(articleId, tag)));
+//        tags.forEach(tag -> tagRepository.save(new Tag(articleId, tag)));
 
         int count = 1;
-//        int count = tagRepository.saveAll(tags.stream()
-//                .map(tag -> new Tag(articleId, tag))
-//                .toList());
-//        log.info("[S] registerTags() : count={}", count);
+        tagRepository.saveAll(tags.stream()
+                .map(tag -> new Tag(articleId, tag))
+                .toList());
+        log.info("[S] registerTags() : count={}", count);
 
         return count;
     }

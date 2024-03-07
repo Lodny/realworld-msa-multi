@@ -19,24 +19,40 @@ import org.springframework.web.client.RestTemplate;
 public class ProfileService {
 
     private final UserRepository userRepository;
+    private final RestTemplate restTemplate;
 
     public ProfileResponse getProfile(final String username, final UserResponse loginUser) {
         RealWorldUser foundUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
-        log.info("getProfile() : foundUser={}", foundUser);
+        log.info("[S] getProfile() : foundUser={}", foundUser);
 
-        if (loginUser == null)
-            return ProfileResponse.of(foundUser, false);
+        Boolean following = getFollowingWithRestTemplate(username, loginUser);
+        log.info("[S] getProfile() : following={}", following);
 
+        return ProfileResponse.of(foundUser, following);
+    }
+
+    public ProfileResponse getProfileById(final Long userId, final UserResponse loginUser) {
+        RealWorldUser foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("user not found"));
+        log.info("[S] getProfileById() : foundUser={}", foundUser);
+
+        Boolean following = getFollowingWithRestTemplate(foundUser.getUsername(), loginUser);
+        log.info("[S] getProfileById() : following={}", following);
+
+        return ProfileResponse.of(foundUser, following);
+    }
+
+    private Boolean getFollowingWithRestTemplate(final String username, final UserResponse loginUser) {
         //todo::WebClient
-        RestTemplate restTemplate = new RestTemplate();
+        if (loginUser == null)
+            return false;
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Token " + loginUser.token());
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<Boolean> response = restTemplate.exchange("http://localhost:8081/api/profiles/" + username + "/follow", HttpMethod.GET, entity, Boolean.class);
-        Boolean following = response.getBody();
-        log.info("getProfile() : following={}", following);
 
-        return ProfileResponse.of(foundUser, following);
+        return response.getBody();
     }
 }

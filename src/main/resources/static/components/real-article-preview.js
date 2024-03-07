@@ -63,8 +63,7 @@ const style = `<style>
 </style>`;
 
 const getTemplate = (article) => {
-    // const author = article.author;
-    const author = {username: 'Juice'}; //todo::
+    const author = article.author;
 
     return `
         ${iconCdn}
