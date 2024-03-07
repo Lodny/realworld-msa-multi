@@ -29,10 +29,10 @@ public class UserController {
     @PostMapping
     public ResponseEntity<?> registerUser(@RequestBody final WrapRegisterUserRequest wrapRegisterUserRequest) {
         RegisterUserRequest registerUserRequest = wrapRegisterUserRequest.user();
-        log.info("[C] registerUser() : registerUserRequest={}", registerUserRequest);
+        log.info("registerUser() : registerUserRequest={}", registerUserRequest);
 
         UserResponse userResponse = userService.registerUser(registerUserRequest);
-        log.info("[C] registerUser() : userResponse={}", userResponse);
+        log.info("registerUser() : userResponse={}", userResponse);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new WrapUserResponse(userResponse));
     }
@@ -40,10 +40,10 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody final WrapLoginRequest wrapLoginRequest) {
         LoginRequest loginRequest = wrapLoginRequest.user();
-        log.info("[C] login() : loginRequest={}", loginRequest);
+        log.info("login() : loginRequest={}", loginRequest);
 
         UserResponse userResponse = userService.login(loginRequest);
-        log.info("[C] login() : userResponse={}", userResponse);
+        log.info("login() : userResponse={}", userResponse);
 
         return ResponseEntity.ok(new WrapUserResponse(userResponse));
     }
@@ -53,10 +53,10 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody final WrapUpdateUserRequest wrapUpdateUserRequest,
                                         @LoginUser final UserResponse loginUser) {
         UpdateUserRequest updateUserRequest = wrapUpdateUserRequest.user();
-        log.info("[C] updateUser() : updateUserRequest={}", updateUserRequest);
+        log.info("updateUser() : updateUserRequest={}", updateUserRequest);
 
         UserResponse userResponse = userService.updateUser(updateUserRequest, loginUser);
-        log.info("[C] registerUser() : userResponse={}", userResponse);
+        log.info("registerUser() : userResponse={}", userResponse);
 
         return ResponseEntity.ok(new WrapUserResponse(userResponse));
     }
@@ -64,10 +64,10 @@ public class UserController {
     @JwtTokenRequired
     @GetMapping("/{username}/id")
     public ResponseEntity<?> getUserId(@PathVariable() String username) {
-        log.info("[C] getUserId() : username={}", username);
+        log.info("getUserId() : username={}", username);
 
         RealWorldUser foundUser = userService.getUserByUsername(username);
-        log.info("[C] getUserId() : foundUser={}", foundUser);
+        log.info("getUserId() : foundUser={}", foundUser);
 
         return ResponseEntity.ok(foundUser.getId());
     }

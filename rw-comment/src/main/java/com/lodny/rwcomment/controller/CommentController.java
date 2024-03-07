@@ -30,23 +30,23 @@ public class CommentController {
                                              @RequestBody final WrapRegisterCommentRequest wrapRegisterCommentRequest,
                                              @LoginUser final Map<String, Object> loginInfo) {
         RegisterCommentRequest registerCommentRequest = wrapRegisterCommentRequest.comment();
-        log.info("[C] registerComment() : slug={}", slug);
-        log.info("[C] registerComment() : registerCommentRequest={}", registerCommentRequest);
-        log.info("[C] registerComment() : loginInfo={}", loginInfo);
+        log.info("registerComment() : slug={}", slug);
+        log.info("registerComment() : registerCommentRequest={}", registerCommentRequest);
+        log.info("registerComment() : loginInfo={}", loginInfo);
 
 //        CommentResponse commentResponse = commentService.registerComment(slug, registerCommentRequest, loginUser);
-//        log.info("[C] registerComment() : commentResponse={}", commentResponse);
+//        log.info("registerComment() : commentResponse={}", commentResponse);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("new WrapCommentResponse(commentResponse)");
     }
 
 //    @GetMapping("/comments")
 //    public ResponseEntity<?> getComments(@PathVariable final String slug, @LoginUser final UserResponse loginUser) {
-//        log.info("[C] getComments() : slug={}", slug);
-//        log.info("[C] getComments() : loginUser={}", loginUser);
+//        log.info("getComments() : slug={}", slug);
+//        log.info("getComments() : loginUser={}", loginUser);
 //
 //        List<CommentResponse> comments = commentService.getComments(slug, loginUser);
-//        log.info("[C] getComments() : comments={}", comments);
+//        log.info("getComments() : comments={}", comments);
 //
 //        return ResponseEntity.ok(new WrapCommentResponses(comments));
 //    }
@@ -56,12 +56,12 @@ public class CommentController {
 //    public ResponseEntity<?> deleteComment(@PathVariable final String slug,
 //                              @PathVariable final Long id,
 //                              @LoginUser final UserResponse loginUser) {
-//        log.info("[C] deleteComment() : slug={}", slug);
-//        log.info("[C] deleteComment() : comment id={}", id);
-//        log.info("[C] deleteComment() : loginUser={}", loginUser);
+//        log.info("deleteComment() : slug={}", slug);
+//        log.info("deleteComment() : comment id={}", id);
+//        log.info("deleteComment() : loginUser={}", loginUser);
 //
 //        final Integer count = commentService.deleteComment(slug, id, loginUser.id());
-//        log.info("[C] deleteComment() : count={}", count);
+//        log.info("deleteComment() : count={}", count);
 //
 //        return ResponseEntity.ok(count);
 //    }

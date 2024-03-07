@@ -26,8 +26,8 @@ public class TagController {
     @PostMapping("/articles/{articleId}/tags/list")
     public ResponseEntity<?> registerTags(@PathVariable final Long articleId,
                                           @RequestBody final Set<String> tags) {
-        log.info("[C] registerTags() : articleId={}", articleId);
-        log.info("[C] registerTags() : tags={}", tags);
+        log.info("registerTags() : articleId={}", articleId);
+        log.info("registerTags() : tags={}", tags);
         int count = tagService.registerTags(articleId, tags);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(count);
@@ -35,9 +35,9 @@ public class TagController {
 
     @GetMapping("/articles/{articleId}/tags")
     public ResponseEntity<?> getTags(@PathVariable final Long articleId) {
-        log.info("[C] getTags() : articleId={}", articleId);
+        log.info("getTags() : articleId={}", articleId);
         Set<Tag> tags = tagService.getTags(articleId);
-        log.info("[C] getTags() : tags={}", tags);
+        log.info("getTags() : tags={}", tags);
 
         return ResponseEntity.ok(tags.stream().map(Tag::getTag).collect(Collectors.toSet()));
     }

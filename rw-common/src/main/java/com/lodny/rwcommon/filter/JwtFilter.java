@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -40,11 +41,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         Claims claims = jwtUtil.getClaimsByToken(token);
         log.info("doFilterInternal() : claims={}", claims);
-        Map<String, Object> loginInfo = Map.of(
-            "email", claims.getSubject(),
-            "userId", claims.get("userId"),
-            "token", token
-        );
+        Map<String, Object> loginInfo = new HashMap<>();
+        loginInfo.put("email", claims.getSubject());
+        loginInfo.put("userId", Long.parseLong((String)claims.get("userId")));
+        loginInfo.put("token", token);
 
         jwtUtil.putLoginInfo(sessionId, loginInfo);
         filterChain.doFilter(request, response);

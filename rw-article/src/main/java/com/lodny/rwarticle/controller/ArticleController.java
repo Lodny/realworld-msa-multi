@@ -32,14 +32,14 @@ public class ArticleController {
     public ResponseEntity<?> registerArticle(@RequestBody final WrapRegisterArticleRequest wrapRegisterArticleRequest,
                                              @LoginUser final Map<String, Object> loginInfo) {
         RegisterArticleRequest registerArticleRequest = wrapRegisterArticleRequest.article();
-        log.info("[C] registerArticle() : registerArticleRequest={}", registerArticleRequest);
-        log.info("[C] registerArticle() : loginInfo={}", loginInfo);
+        log.info("registerArticle() : registerArticleRequest={}", registerArticleRequest);
+        log.info("registerArticle() : loginInfo={}", loginInfo);
 
         Article registeredArticle = articleService.registerArticle(
                 registerArticleRequest,
-                Long.parseLong((String)loginInfo.get("userId")),
+                (Long)loginInfo.get("userId"),
                 (String)loginInfo.get("token"));
-        log.info("[C] registerArticle() : registeredArticle={}", registeredArticle);
+        log.info("registerArticle() : registeredArticle={}", registeredArticle);
 
 //        return ArticleResponse.of(
 //                savedArticle,
@@ -54,11 +54,11 @@ public class ArticleController {
     @GetMapping("/{slug}")
     public ResponseEntity<?> getArticleBySlug(@PathVariable final String slug,
                                               @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] getArticleBySlug() : slug={}", slug);
-        log.info("[C] getArticleBySlug() : loginInfo={}", loginInfo);
+        log.info("getArticleBySlug() : slug={}", slug);
+        log.info("getArticleBySlug() : loginInfo={}", loginInfo);
 
 //        ArticleResponse articleResponse = articleService.getArticleBySlug(slug, loginUser);
-//        log.info("[C] getArticleBySlug() : articleResponse={}", articleResponse);
+//        log.info("getArticleBySlug() : articleResponse={}", articleResponse);
 
         return ResponseEntity.ok("new WrapArticleResponse(articleResponse)");
     }
@@ -67,14 +67,14 @@ public class ArticleController {
     @GetMapping("/feed")
     public ResponseEntity<?> getFeedArticle(@ModelAttribute final ArticleParam articleParam,
                                             @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] getFeedArticle() : articleParam={}", articleParam);
-        log.info("[C] getFeedArticle() : loginInfo={}", loginInfo);
+        log.info("getFeedArticle() : articleParam={}", articleParam);
+        log.info("getFeedArticle() : loginInfo={}", loginInfo);
 
         PageRequest pageRequest = getPageRequest(articleParam);
-        log.info("[C] getFeedArticle() : pageRequest={}", pageRequest);
+        log.info("getFeedArticle() : pageRequest={}", pageRequest);
 
 //        final Page<ArticleResponse> pageArticles = articleService.getFeedArticles((long)loginInfo.get("userId"), pageRequest);
-//        log.info("[C] getFeedArticle() : pageArticles={}", pageArticles);
+//        log.info("getFeedArticle() : pageArticles={}", pageArticles);
 
         return ResponseEntity.ok("new WrapArticleResponses(pageArticles)");
     }
@@ -82,13 +82,13 @@ public class ArticleController {
     @GetMapping
     public ResponseEntity<?> getArticles(@ModelAttribute final ArticleParam articleParam,
                                          @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] getArticles() : articleParam={}", articleParam);
+        log.info("getArticles() : articleParam={}", articleParam);
 
         PageRequest pageRequest = getPageRequest(articleParam);
-        log.info("[C] getArticles() : pageRequest={}", pageRequest);
+        log.info("getArticles() : pageRequest={}", pageRequest);
 
-        final var loginUserId = loginInfo != null ? (long)loginInfo.get("userId") : -1;
-        log.info("[C] getArticles() : loginUserId={}", loginUserId);
+        final var loginUserId = loginInfo != null ? (Long)loginInfo.get("userId") : -1L;
+        log.info("getArticles() : loginUserId={}", loginUserId);
 
         final var token = loginInfo != null ? (String)loginInfo.get("token") : "";
 
@@ -99,7 +99,7 @@ public class ArticleController {
 //                    case "favorited" -> articleService.getArticlesByFavorited(articleParam.favorited(), loginUserId, pageRequest);
                     default          -> articleService.getArticles(pageRequest, loginUserId, token);
                 };
-        log.info("[C] getArticles() : pageArticles={}", pageArticles);
+        log.info("getArticles() : pageArticles={}", pageArticles);
 
         return ResponseEntity.ok(new WrapArticleResponses(pageArticles));
     }
@@ -115,11 +115,21 @@ public class ArticleController {
     @DeleteMapping("/{slug}")
     public ResponseEntity<?> deleteArticleBySlug(@PathVariable final String slug,
                                                  @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] deleteArticleBySlug() : slug={}", slug);
+        log.info("deleteArticleBySlug() : slug={}", slug);
 
 //        int count = articleService.deleteArticleBySlug(slug, loginUser.id());
-//        log.info("[C] deleteArticleBySlug() : count={}", count);
+//        log.info("deleteArticleBySlug() : count={}", count);
 
         return ResponseEntity.ok(1);
+    }
+
+    @GetMapping("/{slug}/id")
+    public ResponseEntity<?> getArticleIdBySlug(@PathVariable final String slug) {
+        log.info("getArticleIdBySlug() : slug={}", slug);
+
+        Long articleId = articleService.getArticleIdBySlug(slug);
+        log.info("getArticleIdBySlug() : articleId={}", articleId);
+
+        return ResponseEntity.ok(articleId);
     }
 }

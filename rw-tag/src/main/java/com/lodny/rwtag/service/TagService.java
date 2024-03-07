@@ -23,7 +23,7 @@ public class TagService {
         tagRepository.saveAll(tags.stream()
                 .map(tag -> new Tag(articleId, tag))
                 .toList());
-        log.info("[S] registerTags() : count={}", count);
+        log.info("registerTags() : count={}", count);
 
         return count;
     }

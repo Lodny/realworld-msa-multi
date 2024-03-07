@@ -24,10 +24,10 @@ public class ProfileService {
     public ProfileResponse getProfile(final String username, final UserResponse loginUser) {
         RealWorldUser foundUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
-        log.info("[S] getProfile() : foundUser={}", foundUser);
+        log.info("getProfile() : foundUser={}", foundUser);
 
         Boolean following = getFollowingWithRestTemplate(username, loginUser);
-        log.info("[S] getProfile() : following={}", following);
+        log.info("getProfile() : following={}", following);
 
         return ProfileResponse.of(foundUser, following);
     }
@@ -35,10 +35,10 @@ public class ProfileService {
     public ProfileResponse getProfileById(final Long userId, final UserResponse loginUser) {
         RealWorldUser foundUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
-        log.info("[S] getProfileById() : foundUser={}", foundUser);
+        log.info("getProfileById() : foundUser={}", foundUser);
 
         Boolean following = getFollowingWithRestTemplate(foundUser.getUsername(), loginUser);
-        log.info("[S] getProfileById() : following={}", following);
+        log.info("getProfileById() : following={}", following);
 
         return ProfileResponse.of(foundUser, following);
     }
@@ -51,7 +51,11 @@ public class ProfileService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Token " + loginUser.token());
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<Boolean> response = restTemplate.exchange("http://localhost:8081/api/profiles/" + username + "/follow", HttpMethod.GET, entity, Boolean.class);
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                "http://localhost:8080/api/profiles/" + username + "/follow",
+                HttpMethod.GET,
+                entity,
+                Boolean.class);
 
         return response.getBody();
     }

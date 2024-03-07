@@ -20,28 +20,28 @@ public class CommentService {
                                            final UserResponse loginUser) {
         Article foundArticle = articleRepository.findBySlug(slug)
                 .orElseThrow(() -> new IllegalArgumentException("article not found"));
-        log.info("[S] registerComment() : foundArticle={}", foundArticle);
+        log.info("registerComment() : foundArticle={}", foundArticle);
 
         Comment comment = Comment.of(registerCommentRequest, foundArticle.getId(), loginUser.id());
-        log.info("[S] registerComment() : comment={}", comment);
+        log.info("registerComment() : comment={}", comment);
         Comment savedComment = commentRepository.save(comment);
-        log.info("[S] registerComment() : savedComment={}", savedComment);
+        log.info("registerComment() : savedComment={}", savedComment);
 
         return CommentResponse.of(savedComment, ProfileResponse.of(loginUser.user(), false));
     }
 
     public int deleteComment(final String slug, final Long commentId, final Long loginUserId) {
-        log.info("[S] deleteComment() : loginUserId={}", loginUserId);
+        log.info("deleteComment() : loginUserId={}", loginUserId);
 
 //        Article article = articleRepository.findBySlug(slug);
 //        if (article == null)
 //            throw new IllegalArgumentException("article not found");
-//        log.info("[S] deleteComment() : article={}", article);
+//        log.info("deleteComment() : article={}", article);
 //
 //        Comment foundComment = commentRepository.findById(commentId);
 //        if (foundComment == null)
 //            throw new IllegalArgumentException("comment not found");
-//        log.info("[S] deleteComment() : foundComment={}", foundComment);
+//        log.info("deleteComment() : foundComment={}", foundComment);
 //
 //        if (! foundComment.getArticleId().equals(article.getId()))
 //            throw new IllegalArgumentException("The comment article id does not match slug-based article id.");
@@ -56,7 +56,7 @@ public class CommentService {
 
     public List<CommentResponse> getComments(final String slug, final UserResponse loginUser) {
         List<Object> commentAndOther = commentRepository.findByArticleIdIncludeUser(slug, loginUser == null ? -1 : loginUser.id());
-        log.info("[S] getComments() : commentAndOther.size()={}", commentAndOther.size());
+        log.info("getComments() : commentAndOther.size()={}", commentAndOther.size());
 
         return commentAndOther.stream().map(obj -> {
             Object[] objs = (Object[]) obj;
@@ -72,8 +72,8 @@ public class CommentService {
     private ArticleResponse getArticleResponseByObjs(final Object[] articleAndOther) {
         final int ARRAY_COUNT = 5;
 
-        log.info("[S] getArticleResponseByObjs() : articleAndOther.length={}", articleAndOther.length);
-        log.info("[S] getArticleResponseByObjs() : articleAndOther={}", articleAndOther);
+        log.info("getArticleResponseByObjs() : articleAndOther.length={}", articleAndOther.length);
+        log.info("getArticleResponseByObjs() : articleAndOther={}", articleAndOther);
         if (articleAndOther.length < ARRAY_COUNT || articleAndOther[0] == null)
             throw new IllegalArgumentException("The article is not found");
 

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,26 +26,29 @@ public class ProfileController {
 
     @GetMapping("/{username}")
     public ResponseEntity<?> getProfile(@PathVariable final String username,
-                                        @LoginUser final UserResponse loginUser) {
-        log.info("[C] getProfile() : username={}", username);
-        log.info("[C] getProfile() : loginUser={}", loginUser);
+                                        @LoginUser final Map<String, Object> loginInfo) {
+        log.info("getProfile() : username={}", username);
+        log.info("getProfile() : loginInfo={}", loginInfo);
+        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.get("user") : null;
 
         ProfileResponse profileResponse = profileService.getProfile(username, loginUser);
         profileResponse.setImage(ImageUtil.nullToDefaultImage(profileResponse.getImage()));
-        log.info("[C] getProfile() : profileResponse={}", profileResponse);
+        log.info("getProfile() : profileResponse={}", profileResponse);
 
         return ResponseEntity.ok(new WrapProfileResponse(profileResponse));
     }
 
     @GetMapping("/by-id/{id}")
     public ResponseEntity<?> getProfileById(@PathVariable final Long id,
-                                            @LoginUser final UserResponse loginUser) {
-        log.info("[C] getProfileById() : id={}", id);
-        log.info("[C] getProfile() : loginUser={}", loginUser);
+                                            @LoginUser final Map<String, Object> loginInfo) {
+        log.info("getProfileById() : id={}", id);
+        log.info("getProfileById() : loginInfo={}", loginInfo);
+
+        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.get("user") : null;
 
         ProfileResponse profileResponse = profileService.getProfileById(id, loginUser);
         profileResponse.setImage(ImageUtil.nullToDefaultImage(profileResponse.getImage()));
-        log.info("[C] getProfile() : profileResponse={}", profileResponse);
+        log.info("getProfileById() : profileResponse={}", profileResponse);
 
         return ResponseEntity.ok(profileResponse);
     }

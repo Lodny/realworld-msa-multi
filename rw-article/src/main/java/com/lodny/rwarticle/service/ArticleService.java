@@ -36,13 +36,13 @@ public class ArticleService {
                                    final Long loginUserId,
                                    final String token) {
         Article article = Article.of(registerArticleRequest, loginUserId);
-        log.info("[S] registerArticle() : article={}", article);
+        log.info("registerArticle() : article={}", article);
 
         Article savedArticle = articleRepository.save(article);
-        log.info("[S] registerArticle() : savedArticle={}", savedArticle);
+        log.info("registerArticle() : savedArticle={}", savedArticle);
 
         String result = registerTagsWithRestTemplate(registerArticleRequest.tagList(), savedArticle.getId(), token);
-        log.info("[S] registerArticle() : result={}", result);
+        log.info("registerArticle() : result={}", result);
 
         return savedArticle;
     }
@@ -51,7 +51,7 @@ public class ArticleService {
                                              final Long loginUserId,
                                              final String token) {
         Page<Article> articlePage = articleRepository.findAllByOrderByCreatedAtDesc(pageRequest);
-        log.info("[S] getArticles() : articlePage={}", articlePage);
+        log.info("getArticles() : articlePage={}", articlePage);
 
         return getArticleResponses(articlePage, loginUserId, token);
     }
@@ -80,7 +80,7 @@ public class ArticleService {
                 })
                 .toList();
 
-        log.info("[S] getArticleResponses() : articleResponses={}", articleResponses);
+        log.info("getArticleResponses() : articleResponses={}", articleResponses);
 
         return new PageImpl<>(articleResponses, articlePage.getPageable(), articlePage.getTotalElements());
     }
@@ -115,16 +115,24 @@ public class ArticleService {
         return response.getBody();
     }
 
+    public Long getArticleIdBySlug(final String slug) {
+        Article foundArticle = articleRepository.findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException("article not found"));
+        log.info("getArticleIdBySlug() : foundArticle={}", foundArticle);
+
+        return foundArticle.getId();
+    }
+
     /*public ArticleResponse getArticleBySlug(final String slug, final UserResponse loginUser) {
         final Long loginUserId = loginUser == null ? -1 : loginUser.id();
-        log.info("[S] getArticleBySlug() : loginUserId={}", loginUserId);
+        log.info("getArticleBySlug() : loginUserId={}", loginUserId);
 
 //        Object[] objects = (Object[])articleRepository.findBySlugIncludeUser(slug, loginUserId);
 //        log.info("getArticleBySlug() : objects={}", objects);
 //        return ArticleResponse.of(objects);
 
         Map<String, Object> map = articleMapper.selectArticleBySlug(slug, loginUserId);
-        log.info("[S] getArticleBySlug() : map={}", map);
+        log.info("getArticleBySlug() : map={}", map);
 
         return ArticleResponse.of(map);
     }*/
@@ -143,7 +151,7 @@ public class ArticleService {
                                                   final Long loginUserId,
                                                   final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getArticlesByTag(tag, loginUserId, pageRequest);
-        log.info("[S] getArticlesByTag() : objs={}", objs);
+        log.info("getArticlesByTag() : objs={}", objs);
 
         return getArticleResponses(objs);
     }
@@ -152,21 +160,21 @@ public class ArticleService {
                                                      final Long loginUserId,
                                                      final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getArticlesByAuthor(author, loginUserId, pageRequest);
-        log.info("[S] getArticlesByTag() : objs={}", objs);
+        log.info("getArticlesByTag() : objs={}", objs);
 
         return getArticleResponses(objs);
     }
 
     public Page<ArticleResponse> getFeedArticles(final Long loginUserId, final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getFeedArticles(loginUserId, pageRequest);
-        log.info("[S] getFeedArticles() : objs={}", objs);
+        log.info("getFeedArticles() : objs={}", objs);
 
         return getArticleResponses(objs);
     }
 
     public Page<ArticleResponse> getArticlesByFavorited(final String favorited, final Long loginUserId, final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getArticlesByFavorited(favorited, loginUserId, pageRequest);
-        log.info("[S] getArticlesByFavorited() : objs={}", objs);
+        log.info("getArticlesByFavorited() : objs={}", objs);
 
         return getArticleResponses(objs);
     }

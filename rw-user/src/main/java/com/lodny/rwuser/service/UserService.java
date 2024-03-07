@@ -23,10 +23,10 @@ public class UserService {
     public UserResponse registerUser(final RegisterUserRequest registerUserRequest) {
         RealWorldUser newUser = RealWorldUser.of(registerUserRequest);
         RealWorldUser savedUser = userRepository.save(newUser);
-        log.info("[S] registerUser() : savedUser={}", savedUser);
+        log.info("registerUser() : savedUser={}", savedUser);
 
         String token = jwtUtil.createToken(savedUser.getEmail(), savedUser.getId());
-        log.info("[S] registerUser() : token={}", token);
+        log.info("registerUser() : token={}", token);
 
         return UserResponse.of(savedUser, token);
     }
@@ -36,24 +36,24 @@ public class UserService {
 
         RealWorldUser foundUser = userRepository.findByEmail(loginRequest.email())
                         .orElseThrow(() -> new RealException(errorMsg));
-        log.info("[S] login() : foundUser={}", foundUser);
+        log.info("login() : foundUser={}", foundUser);
 
         if (! loginRequest.password().equals(foundUser.getPassword()))
             throw new RealException(errorMsg);
 
         String token = jwtUtil.createToken(foundUser.getEmail(), foundUser.getId());
-        log.info("[S] login() : token={}", token);
+        log.info("login() : token={}", token);
 
         return UserResponse.of(foundUser, token);
     }
 
     public UserResponse updateUser(final UpdateUserRequest updateUserRequest, final UserResponse loginUser) {
-        log.info("[S] updateUser() : loginUser={}", loginUser);
+        log.info("updateUser() : loginUser={}", loginUser);
 
         final RealWorldUser user = loginUser.user();
         user.update(updateUserRequest);
         RealWorldUser savedUser = userRepository.save(user);
-        log.info("[S] updateUser() : savedUser={}", savedUser);
+        log.info("updateUser() : savedUser={}", savedUser);
 
         return UserResponse.of(savedUser, loginUser.token());
     }

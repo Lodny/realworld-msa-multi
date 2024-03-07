@@ -33,11 +33,11 @@ public class FollowController {
     @PostMapping("/follow")
     public ResponseEntity<?> follow(@PathVariable final String username,
                                     @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] follow() : username={}", username);
-        log.info("[C] follow() : loginInfo={}", loginInfo);
+        log.info("follow() : username={}", username);
+        log.info("follow() : loginInfo={}", loginInfo);
 
         Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
-        log.info("[C] follow() : followeeId={}", followeeId);
+        log.info("follow() : followeeId={}", followeeId);
 
         long followerId = (Long)loginInfo.get("userId");
         Follow follow = followService.follow(followeeId, followerId);
@@ -53,8 +53,8 @@ public class FollowController {
     @DeleteMapping("/follow")
     public ResponseEntity<?> unfollow(@PathVariable final String username,
                                       @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] unfollow() : username={}", username);
-        log.info("[C] unfollow() : loginInfo={}", loginInfo);
+        log.info("unfollow() : username={}", username);
+        log.info("unfollow() : loginInfo={}", loginInfo);
 
         Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
         log.info("[C} unfollow() : followeeId={}", followeeId);
@@ -72,15 +72,15 @@ public class FollowController {
     @GetMapping("/follow")
     public ResponseEntity<?> isFollow(@PathVariable final String username,
                                       @LoginUser final Map<String, Object> loginInfo) {
-        log.info("[C] isFollow() : username={}", username);
-        log.info("[C] isFollow() : loginInfo={}", loginInfo);
+        log.info("isFollow() : username={}", username);
+        log.info("isFollow() : loginInfo={}", loginInfo);
 
         Long followeeId = getUserIdFromRestTemplate(username, (String)loginInfo.get("token"));
-        log.info("[C] isFollow() : followeeId={}", followeeId);
+        log.info("isFollow() : followeeId={}", followeeId);
 
         long followerId = (Long)loginInfo.get("userId");
         Boolean following = followService.isFollow(followerId, followerId);
-        log.info("[C] isFollow() : following={}", following);
+        log.info("isFollow() : following={}", following);
 
         return ResponseEntity.ok(following);
     }

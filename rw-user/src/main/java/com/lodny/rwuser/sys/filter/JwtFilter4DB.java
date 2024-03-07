@@ -3,6 +3,7 @@ package com.lodny.rwuser.sys.filter;
 import com.lodny.rwcommon.properties.JwtProperty;
 import com.lodny.rwcommon.util.JwtUtil;
 import com.lodny.rwuser.entity.RealWorldUser;
+import com.lodny.rwuser.entity.dto.UserResponse;
 import com.lodny.rwuser.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,7 +39,7 @@ public class JwtFilter4DB extends OncePerRequestFilter {
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
         log.info("[F] doFilterInternal() : foundUser={}", foundUser);
 
-        loginInfo.put("user", foundUser);
+        loginInfo.put("user", UserResponse.of(foundUser, (String)loginInfo.get("token")));
 
         filterChain.doFilter(request, response);
     }
