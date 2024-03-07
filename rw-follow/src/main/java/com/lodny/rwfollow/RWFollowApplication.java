@@ -13,9 +13,4 @@ public class RWFollowApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RWFollowApplication.class, args);
 	}
-
-	@Bean
-	RestTemplate getRestTemplateBean() {
-		return new RestTemplate();
-	}
 }

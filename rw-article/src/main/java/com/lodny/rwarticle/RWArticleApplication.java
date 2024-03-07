@@ -13,9 +13,4 @@ public class RWArticleApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RWArticleApplication.class, args);
 	}
-
-	@Bean
-	RestTemplate getRestTemplateBean() {
-		return new RestTemplate();
-	}
 }
