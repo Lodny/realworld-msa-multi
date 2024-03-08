@@ -7,21 +7,21 @@
     white-space: nowrap;
     margin-right: 3px;
     margin-bottom: .2rem;
-    display: inline-block
-}
+    display: inline-block;
 
-.tag-default[href]:focus, .tag-default[href]:hover {
-    background-color: #687077
-}
+    &[href]:focus, &[href]:hover {
+        background-color: #687077
+    }
 
-.tag-default:hover {
-    text-decoration: none
-}
+    &:hover {
+        text-decoration: none
+    }
 
-.tag-default.tag-outline {
-    border: 1px solid #ddd;
-    color: #aaa !important;
-    background: 0 0 !important
+    &.tag-outline {
+        border: 1px solid #ddd;
+        color: #aaa !important;
+        background: 0 0 !important
+    }
 }
 
 .tag-pill {
@@ -31,12 +31,13 @@
 }
 
 
-ul.tag-list {
-    padding-left: 0 !important;
-    display: inline-block;
-    list-style: none !important
-}
-
-ul.tag-list li {
-    display: inline-block !important
+ul {
+    &.tag-list {
+        padding-left: 0 !important;
+        display: inline-block;
+        list-style: none !important;
+        li {
+            display: inline-block !important;
+        }
+    }
 }

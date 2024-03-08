@@ -92,8 +92,6 @@ const getTemplate = (article, bLogin) => {
         ${iconCdn}
         <link rel="stylesheet" href="../css/common.css">
         <link rel="stylesheet" href="../css/tag.css">
-        <link rel="stylesheet" href="../css/card.css">
-        <link rel="stylesheet" href="../css/form.css">
         ${style}
 
         <div class="article-page">

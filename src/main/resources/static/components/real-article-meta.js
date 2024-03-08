@@ -21,8 +21,6 @@ const getTemplate = (article, isMyArticle, color) => {
         ${iconCdn}
         <link rel="stylesheet" href="../css/common.css">
         <link rel="stylesheet" href="../css/article-meta.css">
-        <link rel="stylesheet" href="../css/card.css">
-        <link rel="stylesheet" href="../css/form.css">
         ${getStyle(color)}
 
         <div class="article-meta">
