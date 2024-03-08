@@ -1,4 +1,4 @@
-import {store} from "../services/store.js";
+import {currentUser, store} from "../services/store.js";
 import {iconCdn} from "../services/icon-cdn.js";
 import {actionQueue, addGoAction} from "../services/action-queue.js";
 
@@ -10,55 +10,57 @@ const style = `<style>
     
     a {
         color: #5CB85C;
+        h1 {
+            color: black;
+        }
     }
     
-    a h1 {
-        color: black;
-    }
     
     .article-preview {
         border-top: 1px solid rgba(0, 0, 0, .1);
-        padding: 1.5rem 0
-    }
-    
-    .article-preview .article-meta {
-        margin: 0 0 1rem
-    }
-    
-    .article-preview .preview-link h1 {
-        font-weight: 600 !important;
-        font-size: 1.5rem !important;
-        margin-bottom: 3px
-    }
-    
-    .article-preview .preview-link p {
-        font-weight: 300;
-        font-size: 24px;
-        color: #999;
-        margin-bottom: 15px;
-        font-size: 1rem;
-        line-height: 1.3rem
-    }
-    
-    .article-preview .preview-link span {
-        max-width: 30%;
-        font-size: .8rem;
-        font-weight: 300;
-        color: #bbb;
-        vertical-align: middle
-    }
-    
-    .article-preview .preview-link ul {
-        float: right;
-        max-width: 50%;
-        vertical-align: top
-    }
-    
-    .article-preview .preview-link ul li {
-        font-weight: 300;
-        font-size: .8rem !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important
+        padding: 1.5rem 0;
+        
+        .article-meta {
+            margin: 0 0 1rem;
+        }
+        
+        .preview-link {
+             h1 {
+                font-weight: 600 !important;
+                font-size: 1.5rem !important;
+                margin-bottom: 3px;
+            }
+        
+            p {
+                font-weight: 300;
+                font-size: 24px;
+                color: #999;
+                margin-bottom: 15px;
+                font-size: 1rem;
+                line-height: 1.3rem;
+            }
+            
+            span {
+                max-width: 30%;
+                font-size: .8rem;
+                font-weight: 300;
+                color: #bbb;
+                vertical-align: middle;
+            }
+            
+            ul {
+                float: right;
+                max-width: 50%;
+                vertical-align: top;
+                li {
+                    font-weight: 300;
+                    font-size: .8rem !important;
+                    padding-top: 0 !important;
+                    padding-bottom: 0 !important;
+                }
+            }
+            
+        }
     }
 </style>`;
 
@@ -134,7 +136,8 @@ class RealArticlePreview extends HTMLElement {
         actionQueue.removeListener(this.listenTypes, this);
     }
 
-    favorite = () => {
+    favorite = (evt) => {
+        evt.preventDefault();
         console.log('real-article-preview::favorite(): this.article:', this.article);
 
         actionQueue.addAction({
@@ -162,11 +165,14 @@ class RealArticlePreview extends HTMLElement {
             : this.favoriteButton.classList.remove('focus');
     }
 
-    callback = ({type, result,data}) => {
+    callback = ({type, result, data}) => {
         console.log('real-article-preview::callback(): type, result:', type, result);
         console.log('real-article-preview::callback(): data:', data);
 
-        const favoriteCallback = (_, {article}) => {
+        const favoriteCallback = (_, data) => {
+            if (!data) return;
+
+            const {article} = data;
             if (this.article.slug !== article.slug) return;
 
             this.article = article;

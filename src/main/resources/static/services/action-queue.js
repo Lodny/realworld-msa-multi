@@ -135,6 +135,19 @@ class ActionQueue {
         return user;
     }
 
+    favoriteAction = ({value: slug}) => {
+        console.log('action-queue::favoriteAction(): slug:', slug);
+
+        if (!this.checkFavoriteAction(slug)) return;
+
+        return realApi.favorite(slug);
+    }
+
+    unfavoriteAction = async (value) => {
+        console.log('action-queue::unfavoriteAction(): value:', value);
+        return this.favoriteAction(value);
+    }
+
     checkFavoriteAction = (slug) => {
         const user = currentUser();
 
@@ -150,22 +163,6 @@ class ActionQueue {
         }
 
         return true;
-    }
-
-    favoriteAction = async ({value: slug}) => {
-        console.log('action-queue::favoriteAction(): slug:', slug);
-
-        if (!this.checkFavoriteAction(slug)) return;
-
-        return await realApi.favorite(slug);
-    }
-
-    unfavoriteAction = async ({value: slug}) => {
-        console.log('action-queue::unfavoriteAction(): slug:', slug);
-
-        if (!this.checkFavoriteAction(slug)) return;
-
-        return realApi.unfavorite(slug);
     }
 
     checkFollowAction = (username) => {
