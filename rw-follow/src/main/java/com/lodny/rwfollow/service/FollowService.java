@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -77,5 +79,13 @@ public class FollowService {
         log.info("isFollow() : followeeId={}", followeeId);
 
         return followRepository.findById(new FollowId(followeeId, followerId)) != null;
+    }
+
+    public List<Long> getFollowees(final long followerId) {
+        return followRepository
+                .findAllByIdFollowerId(followerId).stream()
+                .map(followee -> followee.getId().getFolloweeId())
+                .toList();
+
     }
 }

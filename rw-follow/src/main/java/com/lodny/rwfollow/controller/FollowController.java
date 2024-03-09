@@ -16,12 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/profiles/{username}")
+@RequestMapping("/api")
 public class FollowController {
 
     private final FollowService followService;
@@ -29,7 +30,7 @@ public class FollowController {
 //    private static final String API_URL = "http://localhost:8080/api";
 
     @JwtTokenRequired
-    @PostMapping("/follow")
+    @PostMapping("/profiles/{username}/follow")
     public ResponseEntity<?> follow(@PathVariable final String username,
                                     @LoginUser final LoginInfo loginInfo) {
         log.info("follow() : username={}", username);
@@ -42,7 +43,7 @@ public class FollowController {
     }
 
     @JwtTokenRequired
-    @DeleteMapping("/follow")
+    @DeleteMapping("/profiles/{username}/follow")
     public ResponseEntity<?> unfollow(@PathVariable final String username,
                                       @LoginUser final LoginInfo loginInfo) {
         log.info("unfollow() : username={}", username);
@@ -55,7 +56,7 @@ public class FollowController {
     }
 
     @JwtTokenRequired
-    @GetMapping("/follow")
+    @GetMapping("/profiles/{username}/follow")
     public ResponseEntity<?> isFollow(@PathVariable final String username,
                                       @LoginUser final LoginInfo loginInfo) {
         log.info("isFollow() : username={}", username);
@@ -65,5 +66,16 @@ public class FollowController {
         log.info("isFollow() : following={}", following);
 
         return ResponseEntity.ok(following);
+    }
+
+    @JwtTokenRequired
+    @GetMapping("/follow/followee-list")
+    public ResponseEntity<?> getFollowees(@LoginUser final LoginInfo loginInfo) {
+        log.info("getFollowees() : loginInfo={}", loginInfo);
+
+        List<Long> followees = followService.getFollowees(loginInfo.getUserId());
+        log.info("getFollowees() : followees={}", followees);
+
+        return ResponseEntity.ok(followees);
     }
 }

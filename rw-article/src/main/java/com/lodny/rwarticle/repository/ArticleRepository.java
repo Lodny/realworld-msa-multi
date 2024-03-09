@@ -12,5 +12,6 @@ public interface ArticleRepository extends Repository<Article, Long> {
     Article save(final Article article);
     Optional<Article> findBySlug(final String slug);
     Page<Article> findAllByOrderByCreatedAtDesc(PageRequest pageRequest);
-    Page<Article> findByIdIn(List<Long> articleIds, PageRequest pageRequest);
+    Page<Article> findByIdInOrderByCreatedAtDesc(List<Long> articleIds, PageRequest pageRequest);
+    Page<Article> findByAuthorIdInOrderByCreatedAtDesc(List<Long> followeeIds, PageRequest pageRequest);
 }

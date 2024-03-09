@@ -70,7 +70,7 @@ public class ArticleService {
         log.info("getArticlesByTag() : articleIds={}", articleIds);
         //todo::orderby
 
-        Page<Article> articlePage = articleRepository.findByIdIn(articleIds, pageRequest);
+        Page<Article> articlePage = articleRepository.findByIdInOrderByCreatedAtDesc(articleIds, pageRequest);
         log.info("getArticlesByTag() : articlePage={}", articlePage);
 
         return getArticleResponses(articlePage, loginUserId, token);
@@ -81,6 +81,33 @@ public class ArticleService {
                 "http://localhost:8080/api/tags/" + tag + "/article-ids",
                 HttpMethod.GET,
                 new HttpEntity<String>(new HttpHeaders()),
+                List.class);
+
+        return response.getBody();
+    }
+
+    public Page<ArticleResponse> getFeedArticles(final PageRequest pageRequest, final String token, final Long loginUserId) {
+        log.info("getFeedArticles() : loginUserId={}", loginUserId);
+
+        List<Long> followeeIds = getFolloweeIdsByFollowerIdWithRestTemplate(token);
+        log.info("getFeedArticles() : followeeIds={}", followeeIds);
+        //todo::orderby
+
+        Page<Article> articlePage = articleRepository.findByAuthorIdInOrderByCreatedAtDesc(followeeIds, pageRequest);
+        log.info("getArticlesByTag() : articlePage={}", articlePage);
+
+        return getArticleResponses(articlePage, loginUserId, token);
+    }
+
+    private List<Long> getFolloweeIdsByFollowerIdWithRestTemplate(final String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "http://localhost:8080/api/follow/followee-list",
+                HttpMethod.GET,
+                new HttpEntity<String>(headers),
                 List.class);
 
         return response.getBody();
@@ -202,13 +229,6 @@ public class ArticleService {
                                                      final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getArticlesByAuthor(author, loginUserId, pageRequest);
         log.info("getArticlesByTag() : objs={}", objs);
-
-        return getArticleResponses(objs);
-    }
-
-    public Page<ArticleResponse> getFeedArticles(final Long loginUserId, final PageRequest pageRequest) {
-        Page<Object> objs = articleRepository.getFeedArticles(loginUserId, pageRequest);
-        log.info("getFeedArticles() : objs={}", objs);
 
         return getArticleResponses(objs);
     }

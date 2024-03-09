@@ -70,10 +70,10 @@ public class ArticleController {
         PageRequest pageRequest = getPageRequest(articleParam);
         log.info("getFeedArticle() : pageRequest={}", pageRequest);
 
-//        final Page<ArticleResponse> pageArticles = articleService.getFeedArticles((long)loginInfo.get("userId"), pageRequest);
-//        log.info("getFeedArticle() : pageArticles={}", pageArticles);
+        final Page<ArticleResponse> pageArticles = articleService.getFeedArticles(pageRequest, loginInfo.getToken(), loginInfo.getUserId());
+        log.info("getFeedArticle() : pageArticles={}", pageArticles);
 
-        return ResponseEntity.ok("new WrapArticleResponses(pageArticles)");
+        return ResponseEntity.ok(new WrapArticleResponses(pageArticles));
     }
 
     @GetMapping
