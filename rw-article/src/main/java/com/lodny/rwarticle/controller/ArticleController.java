@@ -4,6 +4,7 @@ import com.lodny.rwarticle.entity.Article;
 import com.lodny.rwarticle.entity.dto.ArticleParam;
 import com.lodny.rwarticle.entity.dto.ArticleResponse;
 import com.lodny.rwarticle.entity.dto.RegisterArticleRequest;
+import com.lodny.rwarticle.entity.wrapper.WrapArticleResponse;
 import com.lodny.rwarticle.entity.wrapper.WrapArticleResponses;
 import com.lodny.rwarticle.entity.wrapper.WrapRegisterArticleRequest;
 import com.lodny.rwarticle.service.ArticleService;
@@ -27,6 +28,10 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
+    private String getTokenByLoginInfo(final Map<String, Object> loginInfo) {
+        return loginInfo != null ? (String) loginInfo.get("token") : "";
+    }
+
     @JwtTokenRequired
     @PostMapping
     public ResponseEntity<?> registerArticle(@RequestBody final WrapRegisterArticleRequest wrapRegisterArticleRequest,
@@ -35,20 +40,13 @@ public class ArticleController {
         log.info("registerArticle() : registerArticleRequest={}", registerArticleRequest);
         log.info("registerArticle() : loginInfo={}", loginInfo);
 
-        Article registeredArticle = articleService.registerArticle(
+        ArticleResponse articleResponse = articleService.registerArticle(
                 registerArticleRequest,
-                (Long)loginInfo.get("userId"),
-                (String)loginInfo.get("token"));
-        log.info("registerArticle() : registeredArticle={}", registeredArticle);
+                (Long) loginInfo.get("userId"),
+                (String) loginInfo.get("token"));
+        log.info("registerArticle() : articleResponse={}", articleResponse);
 
-//        return ArticleResponse.of(
-//                savedArticle,
-//                ProfileResponse.of(loginUser, false),
-//                false,
-//                0L);
-
-//        return ResponseEntity.status(HttpStatus.CREATED).body(new WrapArticleResponse(articleResponse));
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredArticle);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new WrapArticleResponse(articleResponse));
     }
 
     @GetMapping("/{slug}")
@@ -57,10 +55,10 @@ public class ArticleController {
         log.info("getArticleBySlug() : slug={}", slug);
         log.info("getArticleBySlug() : loginInfo={}", loginInfo);
 
-//        ArticleResponse articleResponse = articleService.getArticleBySlug(slug, loginUser);
-//        log.info("getArticleBySlug() : articleResponse={}", articleResponse);
+        ArticleResponse articleResponse = articleService.getArticleBySlug(slug, getTokenByLoginInfo(loginInfo));
+        log.info("getArticleBySlug() : articleResponse={}", articleResponse);
 
-        return ResponseEntity.ok("new WrapArticleResponse(articleResponse)");
+        return ResponseEntity.ok(new WrapArticleResponse(articleResponse));
     }
 
     @JwtTokenRequired
@@ -90,7 +88,7 @@ public class ArticleController {
         final var loginUserId = loginInfo != null ? (Long)loginInfo.get("userId") : -1L;
         log.info("getArticles() : loginUserId={}", loginUserId);
 
-        final var token = loginInfo != null ? (String)loginInfo.get("token") : "";
+        final var token = getTokenByLoginInfo(loginInfo);
 
         final Page<ArticleResponse> pageArticles =
                 switch (articleParam.type()) {

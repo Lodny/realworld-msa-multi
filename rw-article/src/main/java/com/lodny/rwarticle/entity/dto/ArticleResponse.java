@@ -37,7 +37,8 @@ public class ArticleResponse {
 
     public static ArticleResponse of(final Article article,
                                      final Set<String> tagList,
-                                     final ProfileResponse author) {
+                                     final ProfileResponse author,
+                                     final Long[] favoriteInfo) {
         return ArticleResponse.builder()
                 .id(article.getId())
                 .slug(article.getSlug())
@@ -47,8 +48,8 @@ public class ArticleResponse {
                 .tagList(tagList)
                 .createdAt(article.getCreatedAt())
                 .updatedAt(article.getUpdatedAt())
-                .favorited(false)
-                .favoritesCount(0L)
+                .favoritesCount(favoriteInfo[0])
+                .favorited(favoriteInfo[1] == 1L)
                 .author(author)
                 .build();
     }

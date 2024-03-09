@@ -8,4 +8,8 @@ public interface FavoriteRepository extends Repository<Favorite, FavoriteId> {
     Favorite save(Favorite favorite);
 
     void deleteById(FavoriteId favoriteId);
+
+    Favorite findById(FavoriteId favoriteId);
+
+    Long countByIdArticleId(Long articleId);
 }

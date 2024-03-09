@@ -32,19 +32,27 @@ public class ArticleService {
     private final JwtProperty jwtProperty;
 
     @Transactional
-    public Article registerArticle(final RegisterArticleRequest registerArticleRequest,
-                                   final Long loginUserId,
-                                   final String token) {
+    public ArticleResponse registerArticle(final RegisterArticleRequest registerArticleRequest,
+                                           final Long loginUserId,
+                                           final String token) {
         Article article = Article.of(registerArticleRequest, loginUserId);
         log.info("registerArticle() : article={}", article);
 
         Article savedArticle = articleRepository.save(article);
         log.info("registerArticle() : savedArticle={}", savedArticle);
 
-        String result = registerTagsWithRestTemplate(registerArticleRequest.tagList(), savedArticle.getId(), token);
+        Integer result = registerTagsWithRestTemplate(registerArticleRequest.tagList(), savedArticle.getId(), token);
         log.info("registerArticle() : result={}", result);
 
-        return savedArticle;
+        ProfileResponse profileResponse = getProfileByIdWithRestTemplate(savedArticle.getAuthorId(), token);
+        log.info("registerArticle() : profileResponse={}", profileResponse);
+        Long[] favoriteInfo = new Long[]{0L, 0L};
+
+        return ArticleResponse.of(
+                savedArticle,
+                registerArticleRequest.tagList(),
+                profileResponse,
+                favoriteInfo);
     }
 
     public Page<ArticleResponse> getArticles(final PageRequest pageRequest,
@@ -56,17 +64,17 @@ public class ArticleService {
         return getArticleResponses(articlePage, loginUserId, token);
     }
 
-    private String registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
+    private Integer registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", jwtProperty.getTokenTitle() + token);
 
         HttpEntity<Set<String>> requestEntity = new HttpEntity<>(tags, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<Integer> response = restTemplate.exchange(
                 "http://localhost:8080/api/articles/" + articleId + "/tags/list",
                 HttpMethod.POST,
                 requestEntity,
-                String.class);
+                Integer.class);
 
         return response.getBody();
     }
@@ -76,7 +84,8 @@ public class ArticleService {
                 .map(article -> {
                     Set<String> tags = getTagsByArticleIdWithRestTemplate(article.getId());
                     ProfileResponse profileResponse = getProfileByIdWithRestTemplate(article.getAuthorId(), token);
-                    return ArticleResponse.of(article, tags, profileResponse);
+                    Long[] favoriteInfo = getFavoriteInfoByArticleIdWithRestTemplate(article.getId(), token);
+                    return ArticleResponse.of(article, tags, profileResponse, favoriteInfo);
                 })
                 .toList();
 
@@ -86,9 +95,6 @@ public class ArticleService {
     }
 
     private Set<String> getTagsByArticleIdWithRestTemplate(final Long articleId) {
-        //        headers.setContentType(MediaType.APPLICATION_JSON);
-//        headers.set("Authorization", jwtProperty.getTokenTitle() + token);
-
         ResponseEntity<Set> response = restTemplate.exchange(
                 "http://localhost:8080/api/articles/" + articleId + "/tags",
                 HttpMethod.GET,
@@ -123,19 +129,39 @@ public class ArticleService {
         return foundArticle.getId();
     }
 
-    /*public ArticleResponse getArticleBySlug(final String slug, final UserResponse loginUser) {
-        final Long loginUserId = loginUser == null ? -1 : loginUser.id();
-        log.info("getArticleBySlug() : loginUserId={}", loginUserId);
+    @Transactional
+    public ArticleResponse getArticleBySlug(final String slug, final String token) {
+        log.info("getArticleBySlug() : token={}", token);
+        Article foundArticle = articleRepository.findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException("article not found"));
+        log.info("getArticleBySlug() : foundArticle={}", foundArticle);
 
-//        Object[] objects = (Object[])articleRepository.findBySlugIncludeUser(slug, loginUserId);
-//        log.info("getArticleBySlug() : objects={}", objects);
-//        return ArticleResponse.of(objects);
+        Set<String> tags = getTagsByArticleIdWithRestTemplate(foundArticle.getId());
+        log.info("getArticleBySlug() : tags={}", tags);
+        ProfileResponse profileResponse = getProfileByIdWithRestTemplate(foundArticle.getAuthorId(), token);
+        log.info("getArticleBySlug() : profileResponse={}", profileResponse);
+        Long[] favoriteInfo = getFavoriteInfoByArticleIdWithRestTemplate(foundArticle.getId(), token);
+        log.info("getArticleBySlug() : favoriteInfo={}", favoriteInfo);
 
-        Map<String, Object> map = articleMapper.selectArticleBySlug(slug, loginUserId);
-        log.info("getArticleBySlug() : map={}", map);
+        return ArticleResponse.of(foundArticle, tags, profileResponse, favoriteInfo);
+    }
 
-        return ArticleResponse.of(map);
-    }*/
+    private Long[] getFavoriteInfoByArticleIdWithRestTemplate(final Long articleId, final String token) {
+        log.info("getFavoriteInfoByArticleIdWithRestTemplate() : articleId={}", articleId);
+
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtils.hasText(token))
+            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+
+        ResponseEntity<Long[]> response = restTemplate.exchange(
+                "http://localhost:8080/api/articles/" + articleId + "/favorite-info",
+                HttpMethod.GET,
+                new HttpEntity<String>(headers),
+                Long[].class);
+
+        return response.getBody();
+    }
+
     /*public int deleteArticleBySlug(final String slug, final Long loginUserId) {
 //        Article foundArticle = getArticleBySlug(slug);
 //        if (! foundArticle.getAuthorId().equals(loginUserId))

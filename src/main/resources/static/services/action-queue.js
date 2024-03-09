@@ -143,9 +143,12 @@ class ActionQueue {
         return realApi.favorite(slug);
     }
 
-    unfavoriteAction = async (value) => {
-        console.log('action-queue::unfavoriteAction(): value:', value);
-        return this.favoriteAction(value);
+    unfavoriteAction = async ({value: slug}) => {
+        console.log('action-queue::unfavoriteAction(): slug:', slug);
+
+        if (!this.checkFavoriteAction(slug)) return;
+
+        return realApi.unfavorite(slug);
     }
 
     checkFavoriteAction = (slug) => {
