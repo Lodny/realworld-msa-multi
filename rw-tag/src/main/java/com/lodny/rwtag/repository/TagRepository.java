@@ -13,4 +13,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
 
     @Query("SELECT t.tag, COUNT(t) AS tagCount FROM Tag t GROUP BY t.tag ORDER BY tagCount DESC")
     List<String[]> getTop10Tags();
+
+    List<Tag> findAllByTag(String tag);
 }

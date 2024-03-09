@@ -17,8 +17,6 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public int registerTags(final Long articleId, final Set<String> tags) {
-//        tags.forEach(tag -> tagRepository.save(new Tag(articleId, tag)));
-
         int count = 1;
         tagRepository.saveAll(tags.stream()
                 .map(tag -> new Tag(articleId, tag))
@@ -34,5 +32,12 @@ public class TagService {
 
     public Set<Tag> getTags(final Long articleId) {
         return tagRepository.findAllByArticleId(articleId);
+    }
+
+    public List<Long> getArticleIdsByTag(final String tag) {
+        return tagRepository
+                .findAllByTag(tag).stream()
+                .map(Tag::getArticleId)
+                .toList();
     }
 }

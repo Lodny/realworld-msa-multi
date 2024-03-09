@@ -62,6 +62,30 @@ public class ArticleService {
         return getArticleResponses(articlePage, loginUserId, token);
     }
 
+    public Page<ArticleResponse> getArticlesByTag(final PageRequest pageRequest,
+                                                  final Long loginUserId,
+                                                  final String token,
+                                                  final String tag) {
+        List<Long> articleIds = getArticleIdsByTagWithRestTemplate(tag);
+        log.info("getArticlesByTag() : articleIds={}", articleIds);
+        //todo::orderby
+
+        Page<Article> articlePage = articleRepository.findByIdIn(articleIds, pageRequest);
+        log.info("getArticlesByTag() : articlePage={}", articlePage);
+
+        return getArticleResponses(articlePage, loginUserId, token);
+    }
+
+    private List<Long> getArticleIdsByTagWithRestTemplate(final String tag) {
+        ResponseEntity<List> response = restTemplate.exchange(
+                "http://localhost:8080/api/tags/" + tag + "/article-ids",
+                HttpMethod.GET,
+                new HttpEntity<String>(new HttpHeaders()),
+                List.class);
+
+        return response.getBody();
+    }
+
     private Integer registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -171,14 +195,7 @@ public class ArticleService {
         return articleRepository.deleteBySlugAndAuthorId(slug, loginUserId);
     }*/
 /*
-    public Page<ArticleResponse> getArticlesByTag(final String tag,
-                                                  final Long loginUserId,
-                                                  final PageRequest pageRequest) {
-        Page<Object> objs = articleRepository.getArticlesByTag(tag, loginUserId, pageRequest);
-        log.info("getArticlesByTag() : objs={}", objs);
 
-        return getArticleResponses(objs);
-    }
 
     public Page<ArticleResponse> getArticlesByAuthor(final String author,
                                                      final Long loginUserId,

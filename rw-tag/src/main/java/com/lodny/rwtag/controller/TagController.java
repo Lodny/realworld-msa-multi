@@ -51,4 +51,14 @@ public class TagController {
 
         return ResponseEntity.ok(new WrapTag10Response(top10Tags));
     }
+
+    @GetMapping("/tags/{tag}/article-ids")
+    public ResponseEntity<?> getArticleIdsByTag(@PathVariable String tag) {
+        log.info("getArticleIdsByTag() : tag={}", tag);
+
+        List<Long> articleIds = tagService.getArticleIdsByTag(tag);
+        log.info("getArticleIdsByTag() : articleIds={}", articleIds);
+
+        return ResponseEntity.ok(articleIds);
+    }
 }
