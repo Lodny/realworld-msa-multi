@@ -31,15 +31,6 @@ jwt:
   secret: 231qwefopjvkjksflj2iocksdmv89iwseknr23fsd89ihrn23jhv98iuoxrj2389jhcisdkrjh2398
   expiration-ms: 600_000_000 # 10 min
 
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.lodny.realworldmsaarticle.entity.dto
-  configuration:
-    map-underscore-to-camel-case: true
-    cache-enabled: true
-    lazy-loading-enabled: true
-    use-actual-param-name: false
-
 logging:
   level:
     com.lodny.realworldmsaarticle.mapper: DEBUG

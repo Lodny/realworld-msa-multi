@@ -1,5 +1,6 @@
 package com.lodny.rwuser.controller;
 
+import com.lodny.rwcommon.util.LoginInfo;
 import com.lodny.rwuser.entity.dto.ProfileResponse;
 import com.lodny.rwuser.entity.dto.UserResponse;
 import com.lodny.rwuser.entity.wrapper.WrapProfileResponse;
@@ -26,10 +27,10 @@ public class ProfileController {
 
     @GetMapping("/{username}")
     public ResponseEntity<?> getProfile(@PathVariable final String username,
-                                        @LoginUser final Map<String, Object> loginInfo) {
+                                        @LoginUser final LoginInfo loginInfo) {
         log.info("getProfile() : username={}", username);
         log.info("getProfile() : loginInfo={}", loginInfo);
-        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.get("user") : null;
+        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.getUserResponse() : null;
 
         ProfileResponse profileResponse = profileService.getProfile(username, loginUser);
         profileResponse.setImage(ImageUtil.nullToDefaultImage(profileResponse.getImage()));
@@ -40,11 +41,11 @@ public class ProfileController {
 
     @GetMapping("/by-id/{id}")
     public ResponseEntity<?> getProfileById(@PathVariable final Long id,
-                                            @LoginUser final Map<String, Object> loginInfo) {
+                                            @LoginUser final LoginInfo loginInfo) {
         log.info("getProfileById() : id={}", id);
         log.info("getProfileById() : loginInfo={}", loginInfo);
 
-        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.get("user") : null;
+        UserResponse loginUser = (loginInfo != null) ? (UserResponse)loginInfo.getUserResponse() : null;
 
         ProfileResponse profileResponse = profileService.getProfileById(id, loginUser);
         profileResponse.setImage(ImageUtil.nullToDefaultImage(profileResponse.getImage()));

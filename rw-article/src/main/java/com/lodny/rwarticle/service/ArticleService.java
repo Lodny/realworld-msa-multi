@@ -4,9 +4,9 @@ import com.lodny.rwarticle.entity.Article;
 import com.lodny.rwarticle.entity.dto.ArticleResponse;
 import com.lodny.rwarticle.entity.dto.ProfileResponse;
 import com.lodny.rwarticle.entity.dto.RegisterArticleRequest;
-import com.lodny.rwarticle.mapper.ArticleMapper;
 import com.lodny.rwarticle.repository.ArticleRepository;
 import com.lodny.rwcommon.properties.JwtProperty;
+import com.lodny.rwcommon.util.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,24 +27,22 @@ import java.util.Set;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final ArticleMapper articleMapper;
     private final RestTemplate restTemplate;
     private final JwtProperty jwtProperty;
 
     @Transactional
     public ArticleResponse registerArticle(final RegisterArticleRequest registerArticleRequest,
-                                           final Long loginUserId,
-                                           final String token) {
-        Article article = Article.of(registerArticleRequest, loginUserId);
+                                           final LoginInfo loginInfo) {
+        Article article = Article.of(registerArticleRequest, loginInfo.getUserId());
         log.info("registerArticle() : article={}", article);
 
         Article savedArticle = articleRepository.save(article);
         log.info("registerArticle() : savedArticle={}", savedArticle);
 
-        Integer result = registerTagsWithRestTemplate(registerArticleRequest.tagList(), savedArticle.getId(), token);
+        Integer result = registerTagsWithRestTemplate(registerArticleRequest.tagList(), savedArticle.getId(), loginInfo.getToken());
         log.info("registerArticle() : result={}", result);
 
-        ProfileResponse profileResponse = getProfileByIdWithRestTemplate(savedArticle.getAuthorId(), token);
+        ProfileResponse profileResponse = getProfileByIdWithRestTemplate(savedArticle.getAuthorId(), loginInfo.getToken());
         log.info("registerArticle() : profileResponse={}", profileResponse);
         Long[] favoriteInfo = new Long[]{0L, 0L};
 

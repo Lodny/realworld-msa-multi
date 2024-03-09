@@ -8,6 +8,7 @@ import com.lodny.rwcomment.entity.wrapper.WrapRegisterCommentRequest;
 import com.lodny.rwcomment.service.CommentService;
 import com.lodny.rwcommon.annotation.JwtTokenRequired;
 import com.lodny.rwcommon.annotation.LoginUser;
+import com.lodny.rwcommon.util.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class CommentController {
     @PostMapping("/comments")
     public ResponseEntity<?> registerComment(@PathVariable final String slug,
                                              @RequestBody final WrapRegisterCommentRequest wrapRegisterCommentRequest,
-                                             @LoginUser final Map<String, Object> loginInfo) {
+                                             @LoginUser final LoginInfo loginInfo) {
         RegisterCommentRequest registerCommentRequest = wrapRegisterCommentRequest.comment();
         log.info("registerComment() : slug={}", slug);
         log.info("registerComment() : registerCommentRequest={}", registerCommentRequest);

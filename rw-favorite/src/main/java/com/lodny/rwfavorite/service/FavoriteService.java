@@ -1,11 +1,19 @@
 package com.lodny.rwfavorite.service;
 
+import com.lodny.rwcommon.properties.JwtProperty;
 import com.lodny.rwfavorite.entity.Favorite;
 import com.lodny.rwfavorite.entity.FavoriteId;
+import com.lodny.rwfavorite.entity.wrapper.WrapArticleResponse;
 import com.lodny.rwfavorite.repository.FavoriteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
@@ -13,13 +21,53 @@ import org.springframework.stereotype.Service;
 public class FavoriteService {
 
     private final FavoriteRepository favoriteRepository;
+    private final RestTemplate restTemplate;
+    private final JwtProperty jwtProperty;
 
-    public Favorite favorite(final Long articleId, final Long loginUserId) {
-        return favoriteRepository.save(Favorite.of(articleId, loginUserId));
+    private Long getArticleIdFromRestTemplate(final String slug) {  //}, final String token) {
+        ResponseEntity<Long> response = restTemplate.exchange(
+//                FollowController.API_URL + "/users/" + username + "/id",
+                "http://localhost:8080/api/articles/" + slug + "/id",
+                HttpMethod.GET,
+                new HttpEntity<>(new HttpHeaders()),
+                Long.class);
+
+        return response.getBody();
     }
 
-    public void unfavorite(final Long articleId, final Long loginUserId) {
+    private WrapArticleResponse getArticleResponseFromRestTemplate(final String slug,
+                                                                   final String token) {
+        log.info("getArticleResponseFromRestTemplate() : slug={}", slug);
+
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtils.hasText(token))
+            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+
+        ResponseEntity<WrapArticleResponse> response = restTemplate.exchange(
+                "http://localhost:8080/api/articles/" + slug,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                WrapArticleResponse.class);
+
+        return response.getBody();
+    }
+
+    public WrapArticleResponse favorite(final String slug, final long loginUserId, final String token) {
+        log.info("favorite() : loginUserId={}", loginUserId);
+        log.info("favorite() : token={}", token);
+
+        final var articleId = getArticleIdFromRestTemplate(slug);
+        favoriteRepository.save(Favorite.of(articleId, loginUserId));
+        return getArticleResponseFromRestTemplate(slug, token);
+    }
+
+    public WrapArticleResponse unfavorite(final String slug, final long loginUserId, final String token) {
+        log.info("unfavorite() : loginUserId={}", loginUserId);
+        log.info("unfavorite() : token={}", token);
+
+        final var articleId = getArticleIdFromRestTemplate(slug);
         favoriteRepository.deleteById(new FavoriteId(articleId, loginUserId));
+        return getArticleResponseFromRestTemplate(slug, token);
     }
 
     public Long[] favoriteInfo(final Long articleId, final long loginUserId) {
@@ -30,30 +78,4 @@ public class FavoriteService {
 
         return new Long[]{favoritesCount, favorite == null ? 0L : 1L};
     }
-
-//    private final ArticleRepository articleRepository;
-//
-//    public ArticleResponse favorite(final String slug, final Long loginUserId) {
-//        log.info("favorite() : loginUserId={}", loginUserId);
-//        Article article = articleRepository.findBySlug(slug)
-//                .orElseThrow(() -> new IllegalArgumentException("article not found"));
-//
-//        Favorite favorite = favoriteRepository.save(Favorite.of(article.getId(), loginUserId));
-//        log.info("addFavorite() : favorite={}", favorite);
-//
-//        Object[] objets = (Object[])articleRepository.findBySlugIncludeUser(slug, loginUserId);
-//        return ArticleResponse.of(objets);
-//    }
-//
-//    public ArticleResponse unfavorite(final String slug, final Long loginUserId) {
-//        log.info("unfavorite() : loginUserId={}", loginUserId);
-//        Article article = articleRepository.findBySlug(slug)
-//                .orElseThrow(() -> new IllegalArgumentException("article not found"));
-//        log.info("unfavorite() : article={}", article);
-//
-//        favoriteRepository.deleteById(new FavoriteId(article.getId(), loginUserId));
-//
-//        Object[] objets = (Object[])articleRepository.findBySlugIncludeUser(slug, loginUserId);
-//        return ArticleResponse.of(objets);
-//    }
 }

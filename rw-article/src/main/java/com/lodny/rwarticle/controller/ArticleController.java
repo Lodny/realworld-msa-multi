@@ -1,6 +1,5 @@
 package com.lodny.rwarticle.controller;
 
-import com.lodny.rwarticle.entity.Article;
 import com.lodny.rwarticle.entity.dto.ArticleParam;
 import com.lodny.rwarticle.entity.dto.ArticleResponse;
 import com.lodny.rwarticle.entity.dto.RegisterArticleRequest;
@@ -10,6 +9,7 @@ import com.lodny.rwarticle.entity.wrapper.WrapRegisterArticleRequest;
 import com.lodny.rwarticle.service.ArticleService;
 import com.lodny.rwcommon.annotation.JwtTokenRequired;
 import com.lodny.rwcommon.annotation.LoginUser;
+import com.lodny.rwcommon.util.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -28,22 +26,23 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
-    private String getTokenByLoginInfo(final Map<String, Object> loginInfo) {
-        return loginInfo != null ? (String) loginInfo.get("token") : "";
+    private String getTokenByLoginInfo(final LoginInfo loginInfo) {
+        return loginInfo != null ? loginInfo.getToken() : "";
+    }
+
+    private static long getLoginUserId(final LoginInfo loginInfo) {
+        return loginInfo != null ? loginInfo.getUserId() : -1L;
     }
 
     @JwtTokenRequired
     @PostMapping
     public ResponseEntity<?> registerArticle(@RequestBody final WrapRegisterArticleRequest wrapRegisterArticleRequest,
-                                             @LoginUser final Map<String, Object> loginInfo) {
+                                             @LoginUser final LoginInfo loginInfo) {
         RegisterArticleRequest registerArticleRequest = wrapRegisterArticleRequest.article();
         log.info("registerArticle() : registerArticleRequest={}", registerArticleRequest);
         log.info("registerArticle() : loginInfo={}", loginInfo);
 
-        ArticleResponse articleResponse = articleService.registerArticle(
-                registerArticleRequest,
-                (Long) loginInfo.get("userId"),
-                (String) loginInfo.get("token"));
+        ArticleResponse articleResponse = articleService.registerArticle(registerArticleRequest, loginInfo);
         log.info("registerArticle() : articleResponse={}", articleResponse);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new WrapArticleResponse(articleResponse));
@@ -51,7 +50,7 @@ public class ArticleController {
 
     @GetMapping("/{slug}")
     public ResponseEntity<?> getArticleBySlug(@PathVariable final String slug,
-                                              @LoginUser final Map<String, Object> loginInfo) {
+                                              @LoginUser final LoginInfo loginInfo) {
         log.info("getArticleBySlug() : slug={}", slug);
         log.info("getArticleBySlug() : loginInfo={}", loginInfo);
 
@@ -64,7 +63,7 @@ public class ArticleController {
     @JwtTokenRequired
     @GetMapping("/feed")
     public ResponseEntity<?> getFeedArticle(@ModelAttribute final ArticleParam articleParam,
-                                            @LoginUser final Map<String, Object> loginInfo) {
+                                            @LoginUser final LoginInfo loginInfo) {
         log.info("getFeedArticle() : articleParam={}", articleParam);
         log.info("getFeedArticle() : loginInfo={}", loginInfo);
 
@@ -79,13 +78,13 @@ public class ArticleController {
 
     @GetMapping
     public ResponseEntity<?> getArticles(@ModelAttribute final ArticleParam articleParam,
-                                         @LoginUser final Map<String, Object> loginInfo) {
+                                         @LoginUser final LoginInfo loginInfo) {
         log.info("getArticles() : articleParam={}", articleParam);
 
         PageRequest pageRequest = getPageRequest(articleParam);
         log.info("getArticles() : pageRequest={}", pageRequest);
 
-        final var loginUserId = loginInfo != null ? (Long)loginInfo.get("userId") : -1L;
+        final var loginUserId = getLoginUserId(loginInfo);
         log.info("getArticles() : loginUserId={}", loginUserId);
 
         final var token = getTokenByLoginInfo(loginInfo);
@@ -112,7 +111,7 @@ public class ArticleController {
     @JwtTokenRequired
     @DeleteMapping("/{slug}")
     public ResponseEntity<?> deleteArticleBySlug(@PathVariable final String slug,
-                                                 @LoginUser final Map<String, Object> loginInfo) {
+                                                 @LoginUser final LoginInfo loginInfo) {
         log.info("deleteArticleBySlug() : slug={}", slug);
 
 //        int count = articleService.deleteArticleBySlug(slug, loginUser.id());

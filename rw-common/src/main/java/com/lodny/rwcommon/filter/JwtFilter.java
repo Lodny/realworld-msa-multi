@@ -2,6 +2,7 @@ package com.lodny.rwcommon.filter;
 
 import com.lodny.rwcommon.properties.JwtProperty;
 import com.lodny.rwcommon.util.JwtUtil;
+import com.lodny.rwcommon.util.LoginInfo;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -41,10 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         Claims claims = jwtUtil.getClaimsByToken(token);
         log.info("doFilterInternal() : claims={}", claims);
-        Map<String, Object> loginInfo = new HashMap<>();
-        loginInfo.put("email", claims.getSubject());
-        loginInfo.put("userId", Long.parseLong((String)claims.get("userId")));
-        loginInfo.put("token", token);
+        LoginInfo loginInfo = new LoginInfo(
+                claims.getSubject(),
+                Long.parseLong((String)claims.get("userId")),
+                token);
 
         jwtUtil.putLoginInfo(sessionId, loginInfo);
         filterChain.doFilter(request, response);

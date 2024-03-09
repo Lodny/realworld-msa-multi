@@ -24,7 +24,7 @@ public class JwtUtil {
 
     private final JwtProperty jwtProperty;
 
-    private static final Map<String, Map<String, Object>> userMap = new HashMap<>();
+    private static final Map<String, LoginInfo> userMap = new HashMap<>();
 
 
     @EventListener(ApplicationReadyEvent.class)
@@ -77,7 +77,7 @@ public class JwtUtil {
         }
     }
 
-    public void putLoginInfo(final String sessionId, final Map<String, Object> loginInfo) {
+    public void putLoginInfo(final String sessionId, final LoginInfo loginInfo) {
         log.info("putLoginUser() : sessionId={}", sessionId);
         userMap.put(sessionId, loginInfo);
     }
@@ -87,12 +87,13 @@ public class JwtUtil {
         userMap.remove(sessionId);
     }
 
-    public static Map<String, Object> getAuthenticatedUser() {
+    public static LoginInfo getAuthenticatedUser() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) return null;
 
         String sessionId = attributes.getSessionId();
         log.info("getAuthenticatedUser() : sessionId={}", sessionId);
+
         return userMap.get(sessionId);
     }
 }
