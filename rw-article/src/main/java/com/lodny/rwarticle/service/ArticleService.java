@@ -28,6 +28,19 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final RestTemplate restTemplate;
+
+    private HttpHeaders getHttpHeadersByToken(final String token) {
+        log.info("getHttpHeadersByToken() : token={}", token);
+
+        HttpHeaders headers = new HttpHeaders();
+        if (token != null) {
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
+        }
+
+        return headers;
+    }
+
     private final JwtProperty jwtProperty;
 
     @Transactional
@@ -80,8 +93,33 @@ public class ArticleService {
         ResponseEntity<List> response = restTemplate.exchange(
                 "http://localhost:8080/api/tags/" + tag + "/article-ids",
                 HttpMethod.GET,
-                new HttpEntity<String>(new HttpHeaders()),
+                new HttpEntity<String>(getHttpHeadersByToken(null)),
                 List.class);
+
+        return response.getBody();
+    }
+
+    public Page<ArticleResponse> getArticlesByAuthor(final PageRequest pageRequest,
+                                                     final Long loginUserId,
+                                                     final String token,
+                                                     final String author) {
+        log.info("getArticlesByAuthor() : author={}", author);
+
+        final Long authorId = getUserIdByUsernameWithRestTemplate(author, token);
+        log.info("getArticlesByAuthor() : authorId={}", authorId);
+
+        Page<Article> articlePage = articleRepository.findAllByAuthorIdOrderByCreatedAtDesc(authorId, pageRequest);
+        log.info("getArticlesByAuthor() : articlePage={}", articlePage);
+
+        return getArticleResponses(articlePage, loginUserId, token);
+    }
+
+    private Long getUserIdByUsernameWithRestTemplate(final String username, final String token) {
+        ResponseEntity<Long> response = restTemplate.exchange(
+                "http://localhost:8080/api/users/" + username + "/id",
+                HttpMethod.GET,
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
+                Long.class);
 
         return response.getBody();
     }
@@ -100,29 +138,20 @@ public class ArticleService {
     }
 
     private List<Long> getFolloweeIdsByFollowerIdWithRestTemplate(final String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", jwtProperty.getTokenTitle() + token);
-
         ResponseEntity<List> response = restTemplate.exchange(
                 "http://localhost:8080/api/follow/followee-list",
                 HttpMethod.GET,
-                new HttpEntity<String>(headers),
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
                 List.class);
 
         return response.getBody();
     }
 
     private Integer registerTagsWithRestTemplate(final Set<String> tags, final Long articleId, final String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", jwtProperty.getTokenTitle() + token);
-
-        HttpEntity<Set<String>> requestEntity = new HttpEntity<>(tags, headers);
         ResponseEntity<Integer> response = restTemplate.exchange(
                 "http://localhost:8080/api/articles/" + articleId + "/tags/list",
                 HttpMethod.POST,
-                requestEntity,
+                new HttpEntity<>(tags, getHttpHeadersByToken(token)),
                 Integer.class);
 
         return response.getBody();
@@ -147,7 +176,7 @@ public class ArticleService {
         ResponseEntity<Set> response = restTemplate.exchange(
                 "http://localhost:8080/api/articles/" + articleId + "/tags",
                 HttpMethod.GET,
-                new HttpEntity<String>(new HttpHeaders()),
+                new HttpEntity<String>(getHttpHeadersByToken(null)),
                 Set.class);
 
         return response.getBody();
@@ -157,14 +186,10 @@ public class ArticleService {
         log.info("getProfileByIdWithRestTemplate() : authorId={}", authorId);
         log.info("getProfileByIdWithRestTemplate() : token={}", token);
 
-        HttpHeaders headers = new HttpHeaders();
-        if (StringUtils.hasText(token))
-            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
-
         ResponseEntity<ProfileResponse> response = restTemplate.exchange(
                 "http://localhost:8080/api/profiles/by-id/" + authorId,
                 HttpMethod.GET,
-                new HttpEntity<String>(headers),
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
                 ProfileResponse.class);
 
         return response.getBody();
@@ -198,14 +223,10 @@ public class ArticleService {
     private Long[] getFavoriteInfoByArticleIdWithRestTemplate(final Long articleId, final String token) {
         log.info("getFavoriteInfoByArticleIdWithRestTemplate() : articleId={}", articleId);
 
-        HttpHeaders headers = new HttpHeaders();
-        if (StringUtils.hasText(token))
-            headers.set("Authorization", jwtProperty.getTokenTitle() + token);
-
         ResponseEntity<Long[]> response = restTemplate.exchange(
                 "http://localhost:8080/api/articles/" + articleId + "/favorite-info",
                 HttpMethod.GET,
-                new HttpEntity<String>(headers),
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
                 Long[].class);
 
         return response.getBody();
@@ -224,14 +245,7 @@ public class ArticleService {
 /*
 
 
-    public Page<ArticleResponse> getArticlesByAuthor(final String author,
-                                                     final Long loginUserId,
-                                                     final PageRequest pageRequest) {
-        Page<Object> objs = articleRepository.getArticlesByAuthor(author, loginUserId, pageRequest);
-        log.info("getArticlesByTag() : objs={}", objs);
 
-        return getArticleResponses(objs);
-    }
 
     public Page<ArticleResponse> getArticlesByFavorited(final String favorited, final Long loginUserId, final PageRequest pageRequest) {
         Page<Object> objs = articleRepository.getArticlesByFavorited(favorited, loginUserId, pageRequest);

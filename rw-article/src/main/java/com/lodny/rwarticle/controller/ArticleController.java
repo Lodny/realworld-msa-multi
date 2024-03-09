@@ -92,7 +92,7 @@ public class ArticleController {
         final Page<ArticleResponse> pageArticles =
                 switch (articleParam.type()) {
                     case "tag"       -> articleService.getArticlesByTag(pageRequest, loginUserId, token, articleParam.tag());
-//                    case "author"    -> articleService.getArticlesByAuthor(articleParam.author(), loginUserId, pageRequest);
+                    case "author"    -> articleService.getArticlesByAuthor(pageRequest, loginUserId, token, articleParam.author());
 //                    case "favorited" -> articleService.getArticlesByFavorited(articleParam.favorited(), loginUserId, pageRequest);
                     default          -> articleService.getArticles(pageRequest, loginUserId, token);
                 };

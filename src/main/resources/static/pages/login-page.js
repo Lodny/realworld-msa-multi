@@ -77,7 +77,7 @@ class LoginPage extends HTMLElement {
             data: {
                 // email: this.emailTag.value,
                 // password: this.passwordTag.value,
-                email: 'coco@drink.com',
+                email: 'cider@drink.com',
                 password: '1234'
             },
             set: 'user',
