@@ -124,6 +124,35 @@ public class ArticleService {
         return response.getBody();
     }
 
+    public Page<ArticleResponse> getArticlesByFavorited(final PageRequest pageRequest,
+                                                        final Long loginUserId,
+                                                        final String token,
+                                                        final String favoriteUser) {
+        log.info("getArticlesByFavorited() : favoriteUser={}", favoriteUser);
+
+        final Long favoriteUserId = getUserIdByUsernameWithRestTemplate(favoriteUser, token);
+        log.info("getArticlesByFavorited() : favoriteUserId={}", favoriteUserId);
+
+        List<Long> articleIds = getArticleIdsByFavoriteWithRestTemplate(favoriteUserId, token);
+        log.info("getArticlesByFavorited() : articleIds={}", articleIds);
+
+        Page<Article> articlePage = articleRepository.findAllByIdInOrderByCreatedAtDesc(articleIds, pageRequest);
+        log.info("getArticlesByFavorited() : articlePage={}", articlePage);
+
+        return getArticleResponses(articlePage, loginUserId, token);
+    }
+
+    private List<Long> getArticleIdsByFavoriteWithRestTemplate(final Long favoriteUserId, final String token) {
+        ResponseEntity<List> response = restTemplate.exchange(
+                "http://localhost:8080/api/favorite/" + favoriteUserId + "/article-ids",
+                HttpMethod.GET,
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
+                List.class);
+
+        return response.getBody();
+    }
+
+
     public Page<ArticleResponse> getFeedArticles(final PageRequest pageRequest, final String token, final Long loginUserId) {
         log.info("getFeedArticles() : loginUserId={}", loginUserId);
 
@@ -247,11 +276,6 @@ public class ArticleService {
 
 
 
-    public Page<ArticleResponse> getArticlesByFavorited(final String favorited, final Long loginUserId, final PageRequest pageRequest) {
-        Page<Object> objs = articleRepository.getArticlesByFavorited(favorited, loginUserId, pageRequest);
-        log.info("getArticlesByFavorited() : objs={}", objs);
 
-        return getArticleResponses(objs);
-    }
 */
 }

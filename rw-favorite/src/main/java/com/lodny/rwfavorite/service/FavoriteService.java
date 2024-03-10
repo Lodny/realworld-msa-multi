@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -73,9 +75,19 @@ public class FavoriteService {
     public Long[] favoriteInfo(final Long articleId, final long loginUserId) {
         Long favoritesCount = favoriteRepository.countByIdArticleId(articleId);
         log.info("favoriteInfo() : favoritesCount={}", favoritesCount);
+
         Favorite favorite = favoriteRepository.findById(new FavoriteId(articleId, loginUserId));
         log.info("addFavorite() : favorite={}", favorite);
 
         return new Long[]{favoritesCount, favorite == null ? 0L : 1L};
+    }
+
+    public List<Long> getArticleIdsByUserid(final Long userId) {
+        log.info("getArticleIdsByUserid() : userId={}", userId);
+
+        return favoriteRepository
+                .findAllByIdUserId(userId).stream()
+                .map(favorite -> favorite.getId().getArticleId())
+                .toList();
     }
 }

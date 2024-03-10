@@ -2,21 +2,21 @@ package com.lodny.rwfavorite.controller;
 
 import com.lodny.rwcommon.annotation.JwtTokenRequired;
 import com.lodny.rwcommon.annotation.LoginUser;
-import com.lodny.rwcommon.properties.JwtProperty;
 import com.lodny.rwcommon.util.LoginInfo;
 import com.lodny.rwfavorite.entity.wrapper.WrapArticleResponse;
 import com.lodny.rwfavorite.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.util.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/articles")
+@RequestMapping("/api")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -30,7 +30,7 @@ public class FavoriteController {
     }
 
     @JwtTokenRequired
-    @PostMapping("/{slug}/favorite")
+    @PostMapping("/articles/{slug}/favorite")
     public ResponseEntity<?> favorite(@PathVariable final String slug,
                                       @LoginUser final LoginInfo loginInfo) {
         log.info("favorite() : slug={}", slug);
@@ -43,7 +43,7 @@ public class FavoriteController {
     }
 
     @JwtTokenRequired
-    @DeleteMapping("/{slug}/favorite")
+    @DeleteMapping("/articles/{slug}/favorite")
     public ResponseEntity<?> unfavorite(@PathVariable final String slug,
                                         @LoginUser final LoginInfo loginInfo) {
         log.info("unfavorite() : slug={}", slug);
@@ -55,7 +55,7 @@ public class FavoriteController {
         return ResponseEntity.ok(wrapArticleResponse);
     }
 
-    @GetMapping("/{articleId}/favorite-info")
+    @GetMapping("/articles/{articleId}/favorite-info")
     public ResponseEntity<?> favoriteInfo(@PathVariable final Long articleId,
                                           @LoginUser final LoginInfo loginInfo) {
         log.info("favoriteInfo() : articleId={}", articleId);
@@ -65,5 +65,17 @@ public class FavoriteController {
         log.info("favoriteInfo() : favoriteInfo={}", favoriteInfo);
 
         return ResponseEntity.ok(favoriteInfo);
+    }
+
+    @GetMapping("/favorite/{userId}/article-ids")
+    public ResponseEntity<?> getArticleIdsByUserid(@PathVariable final Long userId,
+                                                   @LoginUser final LoginInfo loginInfo) {
+        log.info("getArticleIdsByUserid() : userId={}", userId);
+        log.info("favoriteInfo() : loginInfo={}", loginInfo);
+
+        List<Long> articleIds = favoriteService.getArticleIdsByUserid(userId);
+        log.info("getArticleIdsByUserid() : articleIds={}", articleIds);
+
+        return ResponseEntity.ok(articleIds);
     }
 }
