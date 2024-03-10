@@ -15,4 +15,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     List<String[]> getTop10Tags();
 
     List<Tag> findAllByTag(String tag);
+
+    List<Tag> deleteAllByArticleId(Long articleId);
 }

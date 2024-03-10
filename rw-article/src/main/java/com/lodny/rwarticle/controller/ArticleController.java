@@ -114,7 +114,7 @@ public class ArticleController {
                                                        @LoginUser final LoginInfo loginInfo) {
         log.info("deleteArticleBySlug() : slug={}", slug);
 
-        int count = articleService.deleteArticleBySlug(slug, loginInfo.getUserId());
+        int count = articleService.deleteArticleBySlug(slug, loginInfo.getUserId(), loginInfo.getToken());
         log.info("deleteArticleBySlug() : count={}", count);
 
         return ResponseEntity.ok(1);

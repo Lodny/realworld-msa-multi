@@ -61,4 +61,14 @@ public class TagController {
 
         return ResponseEntity.ok(articleIds);
     }
+
+    @JwtTokenRequired
+    @DeleteMapping("/tags/{articleId}")
+    public ResponseEntity<?> deleteTagsByArticleId(@PathVariable Long articleId) {
+        log.info("deleteTagsByArticleId() : articleId={}", articleId);
+
+        List<Tag> tags = tagService.deleteTagsByArticleId(articleId);
+
+        return ResponseEntity.ok(tags.stream().map(Tag::getId).toList());
+    }
 }

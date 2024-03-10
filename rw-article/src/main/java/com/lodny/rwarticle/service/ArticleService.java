@@ -259,7 +259,10 @@ public class ArticleService {
         return response.getBody();
     }
 
-    public int deleteArticleBySlug(final String slug, final Long loginUserId) {
+    @Transactional
+    public int deleteArticleBySlug(final String slug, final Long loginUserId, final String token) {
+        log.info("deleteArticleBySlug() : loginUserId={}", loginUserId);
+
         Article foundArticle = articleRepository.findBySlug(slug)
                 .orElseThrow(() -> new IllegalArgumentException("article not found"));
 
@@ -267,8 +270,24 @@ public class ArticleService {
         if (! foundArticle.getAuthorId().equals(loginUserId))
             throw new IllegalArgumentException("The author is different from the logged-in user.");
 
+        List<Long> deletedTagIds = deleteTagsByArticleIdWithRestTemplate(foundArticle.getId(), token);
+        log.info("deleteArticleBySlug() : deletedTagIds={}", deletedTagIds);
+
+//        throw new IllegalArgumentException("throw error");
         articleRepository.delete(foundArticle);
 
         return 1;
+    }
+
+    private List<Long> deleteTagsByArticleIdWithRestTemplate(final Long articleId, final String token) {
+        log.info("deleteTagsByArticleIdWithRestTemplate() : articleId={}", articleId);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "http://localhost:8080/api/tags/" + articleId,
+                HttpMethod.DELETE,
+                new HttpEntity<String>(getHttpHeadersByToken(token)),
+                List.class);
+
+        return response.getBody();
     }
 }
