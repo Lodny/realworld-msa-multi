@@ -110,12 +110,12 @@ public class ArticleController {
 
     @JwtTokenRequired
     @DeleteMapping("/{slug}")
-    public ResponseEntity<?> deleteArticleBySlug(@PathVariable final String slug,
-                                                 @LoginUser final LoginInfo loginInfo) {
+    public ResponseEntity<Integer> deleteArticleBySlug(@PathVariable final String slug,
+                                                       @LoginUser final LoginInfo loginInfo) {
         log.info("deleteArticleBySlug() : slug={}", slug);
 
-//        int count = articleService.deleteArticleBySlug(slug, loginUser.id());
-//        log.info("deleteArticleBySlug() : count={}", count);
+        int count = articleService.deleteArticleBySlug(slug, loginInfo.getUserId());
+        log.info("deleteArticleBySlug() : count={}", count);
 
         return ResponseEntity.ok(1);
     }

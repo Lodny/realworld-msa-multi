@@ -259,21 +259,16 @@ public class ArticleService {
         return response.getBody();
     }
 
-    /*public int deleteArticleBySlug(final String slug, final Long loginUserId) {
-//        Article foundArticle = getArticleBySlug(slug);
-//        if (! foundArticle.getAuthorId().equals(loginUserId))
-//            throw new IllegalArgumentException("The author is different from the logged-in user.");
-//
-//        articleRepository.delete(foundArticle);
+    public int deleteArticleBySlug(final String slug, final Long loginUserId) {
+        Article foundArticle = articleRepository.findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException("article not found"));
 
-//        articleRepository.deleteBySlug(slug);
-        return articleRepository.deleteBySlugAndAuthorId(slug, loginUserId);
-    }*/
-/*
+        //todo::delete tags and comments ???
+        if (! foundArticle.getAuthorId().equals(loginUserId))
+            throw new IllegalArgumentException("The author is different from the logged-in user.");
 
+        articleRepository.delete(foundArticle);
 
-
-
-
-*/
+        return 1;
+    }
 }
