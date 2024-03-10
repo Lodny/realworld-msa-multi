@@ -25,6 +25,10 @@ import java.util.Map;
 public class CommentController {
     private final CommentService commentService;
 
+    private String getTokenByLoginInfo(final LoginInfo loginInfo) {
+        return loginInfo != null ? loginInfo.getToken() : "";
+    }
+
     @JwtTokenRequired
     @PostMapping("/comments")
     public ResponseEntity<?> registerComment(@PathVariable final String slug,
@@ -47,24 +51,23 @@ public class CommentController {
         log.info("getComments() : slug={}", slug);
         log.info("getComments() : loginInfo={}", loginInfo);
 
-        List<CommentResponse> comments = commentService.getComments(slug, loginInfo);
+        List<CommentResponse> comments = commentService.getComments(slug, getTokenByLoginInfo(loginInfo));
         log.info("getComments() : comments={}", comments);
 
         return ResponseEntity.ok(new WrapCommentResponses(comments));
     }
 
-//    @JwtTokenRequired
-//    @DeleteMapping("/comments/{id}")
-//    public ResponseEntity<?> deleteComment(@PathVariable final String slug,
-//                              @PathVariable final Long id,
-//                              @LoginUser final UserResponse loginUser) {
-//        log.info("deleteComment() : slug={}", slug);
-//        log.info("deleteComment() : comment id={}", id);
-//        log.info("deleteComment() : loginUser={}", loginUser);
-//
-//        final Integer count = commentService.deleteComment(slug, id, loginUser.id());
-//        log.info("deleteComment() : count={}", count);
-//
-//        return ResponseEntity.ok(count);
-//    }
+    @JwtTokenRequired
+    @DeleteMapping("/comments/{id}")
+    public ResponseEntity<?> deleteComment(@PathVariable final String slug,
+                                           @PathVariable final Long id,
+                                           @LoginUser final LoginInfo loginInfo) {
+        log.info("deleteComment() : slug={}", slug);
+        log.info("deleteComment() : comment id={}", id);
+        log.info("deleteComment() : loginInfo={}", loginInfo);
+
+        commentService.deleteComment(slug, id, loginInfo.getUserId());
+
+        return ResponseEntity.ok(id);
+    }
 }

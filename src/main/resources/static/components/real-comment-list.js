@@ -1,7 +1,6 @@
 import {iconCdn} from "../services/icon-cdn.js";
-import {currentUser, store} from "../services/store.js";
+import {currentUser} from "../services/store.js";
 import {actionQueue, addGoAction} from "../services/action-queue.js";
-import {RealComment} from "./real-comment.js";
 
 const style = `<style>
     .comment-form {
@@ -89,6 +88,7 @@ class RealCommentList extends HTMLElement {
         this.shadowRoot.querySelectorAll('a')
             .forEach(link => link.addEventListener('click', this.goLink));
 
+        this.textareaTag = this.shadowRoot.querySelector('textarea');
         this.shadowRoot
             .querySelector('button')
             ?.addEventListener('click', this.addComment);
@@ -115,20 +115,17 @@ class RealCommentList extends HTMLElement {
 
     addComment = (evt) => {
         evt.preventDefault();
-
-        const textareaTag = this.shadowRoot.querySelector('textarea');
-        const body = textareaTag.value;
-        console.log('real-comment-list::addComment(): body:', body);
+        // console.log('real-comment-list::addComment(): this.textareaTag.value:', this.textareaTag.value);
 
         actionQueue.addAction({
             type: 'addComment',
             data: {
                 slug: this.slug,
-                value: body,
+                value: this.textareaTag.value,
             },
         });
 
-        textareaTag.value = '';
+        this.textareaTag.value = '';
     }
 
     insertComment(commentId) {
@@ -152,6 +149,7 @@ class RealCommentList extends HTMLElement {
 
         const addCommentCallback = ({id}) => {
             this.insertComment(id);
+            this.textareaTag.focus();
         }
 
         const runCallback = {

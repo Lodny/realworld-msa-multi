@@ -69,6 +69,10 @@ spring:
           uri: http://localhost:8086
           predicates:
             - Path=/api/articles/*/comments
+        - id: comment
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/articles/*/comments/**
 
 logging:
   level:

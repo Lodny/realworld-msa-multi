@@ -87,13 +87,13 @@ class RealComment extends HTMLElement {
         this.attachShadow({mode: 'open'});
         this.listenTypes = ['deleteComment'];
 
-        this.commentId = this.getAttribute('id');
+        this.commentId = +this.getAttribute('id');
         console.log('real-comment::constructor(): this.commentId:', this.commentId);
 
         this.slug = this.getAttribute('slug');
         console.log('real-comment::constructor(): this.slug:', this.slug);
 
-        const comment = store.getComment(Number(this.commentId));
+        const comment = store.getComment(this.commentId);
         console.log('real-comment::constructor(): comment:', comment);
 
         const user = currentUser();
@@ -134,17 +134,19 @@ class RealComment extends HTMLElement {
         });
     }
 
-    callback = ({type, result}) => {
-        console.log('real-comment::callback(): type, result', type, result);
+    callback = ({type, result, data}) => {
+        console.log('real-comment::callback(): type, result', type, result, data);
 
-        const deleteCommentCallback = () => {
+        const deleteCommentCallback = (result, id) => {
+            if (this.commentId !== id) return;
+
             this.remove();
         }
 
         const runCallback = {
             'deleteComment':   deleteCommentCallback,
         }
-        runCallback[type] && runCallback[type](result);
+        runCallback[type] && runCallback[type](result, data);
     }
 }
 customElements.define('real-comment', RealComment);

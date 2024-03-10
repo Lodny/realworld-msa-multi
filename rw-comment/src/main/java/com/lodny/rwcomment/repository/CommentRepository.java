@@ -9,9 +9,6 @@ import java.util.Optional;
 public interface CommentRepository extends Repository<Comment, Long> {
     Comment save(Comment comment);
     Optional<Comment> findById(Long commentId);
-
-    // todo::delete one query
     void delete(Comment foundComment);
-
     List<Comment> findAllByArticleIdOrderByCreatedAtDesc(Long articleId);
 }
