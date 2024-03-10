@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -61,6 +63,20 @@ public class CommentService {
         return CommentResponse.of(savedComment, profileResponse);
     }
 
+    public List<CommentResponse> getComments(final String slug, final LoginInfo loginUser) {
+        final Long articleId = getArticleIdBySlugWithRestTemplate(slug);
+        log.info("registerComment() : articleId={}", articleId);
+
+        List<Comment> comments = commentRepository.findAllByArticleIdOrderByCreatedAtDesc(articleId);
+        log.info("getComments() : comments={}", comments);
+
+        return comments.stream()
+                .map(comment -> {
+                    ProfileResponse profileResponse = getProfileResponseByUserIdWithRestTemplate(loginUser.getUserId());
+                    return CommentResponse.of(comment, profileResponse);
+                })
+                .toList();
+    }
 
 
 
@@ -89,20 +105,7 @@ public class CommentService {
         return commentRepository.deleteDirectly(slug, commentId, loginUserId);
     }
 
-    public List<CommentResponse> getComments(final String slug, final UserResponse loginUser) {
-        List<Object> commentAndOther = commentRepository.findByArticleIdIncludeUser(slug, loginUser == null ? -1 : loginUser.id());
-        log.info("getComments() : commentAndOther.size()={}", commentAndOther.size());
 
-        return commentAndOther.stream().map(obj -> {
-            Object[] objs = (Object[]) obj;
-            if (objs.length < 3)
-                throw new IllegalArgumentException("objs size is wrong");
-
-            Comment comment = (Comment) objs[0];
-            RealWorldUser user = (RealWorldUser) objs[1];
-            return CommentResponse.of(comment, ProfileResponse.of(user, (Boolean)objs[2]));
-        }).toList();
-    }
 
     private ArticleResponse getArticleResponseByObjs(final Object[] articleAndOther) {
         final int ARRAY_COUNT = 5;

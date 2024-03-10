@@ -41,17 +41,18 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new WrapCommentResponse(commentResponse));
     }
 
-//    @GetMapping("/comments")
-//    public ResponseEntity<?> getComments(@PathVariable final String slug, @LoginUser final UserResponse loginUser) {
-//        log.info("getComments() : slug={}", slug);
-//        log.info("getComments() : loginUser={}", loginUser);
-//
-//        List<CommentResponse> comments = commentService.getComments(slug, loginUser);
-//        log.info("getComments() : comments={}", comments);
-//
-//        return ResponseEntity.ok(new WrapCommentResponses(comments));
-//    }
-//
+    @GetMapping("/comments")
+    public ResponseEntity<?> getComments(@PathVariable final String slug,
+                                         @LoginUser final LoginInfo loginInfo) {
+        log.info("getComments() : slug={}", slug);
+        log.info("getComments() : loginInfo={}", loginInfo);
+
+        List<CommentResponse> comments = commentService.getComments(slug, loginInfo);
+        log.info("getComments() : comments={}", comments);
+
+        return ResponseEntity.ok(new WrapCommentResponses(comments));
+    }
+
 //    @JwtTokenRequired
 //    @DeleteMapping("/comments/{id}")
 //    public ResponseEntity<?> deleteComment(@PathVariable final String slug,
