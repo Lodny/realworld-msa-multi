@@ -213,7 +213,7 @@ class ProfilePage extends HTMLElement {
             this.updateFollowing(this.profile);
         }
 
-        const changePageCallback = (paeg) => {
+        const changePageCallback = (page) => {
             this.getArticles(this.activeTab, +page);
         }
 

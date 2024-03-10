@@ -28,20 +28,19 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final RestTemplate restTemplate;
+    private final JwtProperty jwtProperty;
 
     private HttpHeaders getHttpHeadersByToken(final String token) {
         log.info("getHttpHeadersByToken() : token={}", token);
 
         HttpHeaders headers = new HttpHeaders();
-        if (token != null) {
+        if (StringUtils.hasText(token)) {
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", jwtProperty.getTokenTitle() + token);
         }
 
         return headers;
     }
-
-    private final JwtProperty jwtProperty;
 
     @Transactional
     public ArticleResponse registerArticle(final RegisterArticleRequest registerArticleRequest,
@@ -57,13 +56,12 @@ public class ArticleService {
 
         ProfileResponse profileResponse = getProfileByIdWithRestTemplate(savedArticle.getAuthorId(), loginInfo.getToken());
         log.info("registerArticle() : profileResponse={}", profileResponse);
-        Long[] favoriteInfo = new Long[]{0L, 0L};
 
         return ArticleResponse.of(
                 savedArticle,
                 registerArticleRequest.tagList(),
                 profileResponse,
-                favoriteInfo);
+                new Long[]{0L, 0L});
     }
 
     public Page<ArticleResponse> getArticles(final PageRequest pageRequest,

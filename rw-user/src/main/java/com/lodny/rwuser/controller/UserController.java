@@ -61,7 +61,6 @@ public class UserController {
         return ResponseEntity.ok(new WrapUserResponse(userResponse));
     }
 
-    @JwtTokenRequired
     @GetMapping("/{username}/id")
     public ResponseEntity<?> getUserId(@PathVariable() String username) {
         log.info("getUserId() : username={}", username);
