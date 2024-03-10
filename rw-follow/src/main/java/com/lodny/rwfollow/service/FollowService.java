@@ -25,7 +25,7 @@ public class FollowService {
     private final RestTemplate restTemplate;
     private final JwtProperty jwtProperty;
 
-    private Long getUserIdFromRestTemplate(final String username, final String token) {
+    private Long getUserIdWithRestTemplate(final String username, final String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", jwtProperty.getTokenTitle() + token);
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -51,7 +51,7 @@ public class FollowService {
     }
 
     public WrapProfileResponse follow(final String username, final long followerId, final String token) {
-        Long followeeId = getUserIdFromRestTemplate(username, token);
+        Long followeeId = getUserIdWithRestTemplate(username, token);
         log.info("follow() : followeeId={}", followeeId);
 
         followRepository.save(Follow.of(followeeId, followerId));
@@ -63,7 +63,7 @@ public class FollowService {
     }
 
     public WrapProfileResponse unfollow(final String username, final long followerId, final String token) {
-        Long followeeId = getUserIdFromRestTemplate(username, token);
+        Long followeeId = getUserIdWithRestTemplate(username, token);
         log.info("follow() : followeeId={}", followeeId);
 
         followRepository.deleteById(new FollowId(followeeId, followerId));
@@ -75,7 +75,7 @@ public class FollowService {
     }
 
     public Boolean isFollow(final String username, final long followerId, final String token) {
-        Long followeeId = getUserIdFromRestTemplate(username, token);
+        Long followeeId = getUserIdWithRestTemplate(username, token);
         log.info("isFollow() : followeeId={}", followeeId);
 
         return followRepository.findById(new FollowId(followeeId, followerId)) != null;

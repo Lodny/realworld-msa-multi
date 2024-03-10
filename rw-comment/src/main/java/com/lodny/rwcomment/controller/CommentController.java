@@ -35,10 +35,10 @@ public class CommentController {
         log.info("registerComment() : registerCommentRequest={}", registerCommentRequest);
         log.info("registerComment() : loginInfo={}", loginInfo);
 
-//        CommentResponse commentResponse = commentService.registerComment(slug, registerCommentRequest, loginUser);
-//        log.info("registerComment() : commentResponse={}", commentResponse);
+        CommentResponse commentResponse = commentService.registerComment(slug, registerCommentRequest, loginInfo);
+        log.info("registerComment() : commentResponse={}", commentResponse);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("new WrapCommentResponse(commentResponse)");
+        return ResponseEntity.status(HttpStatus.CREATED).body(new WrapCommentResponse(commentResponse));
     }
 
 //    @GetMapping("/comments")

@@ -26,7 +26,7 @@ public class FavoriteService {
     private final RestTemplate restTemplate;
     private final JwtProperty jwtProperty;
 
-    private Long getArticleIdFromRestTemplate(final String slug) {  //}, final String token) {
+    private Long getArticleIdBySlugWithRestTemplate(final String slug) {  //}, final String token) {
         ResponseEntity<Long> response = restTemplate.exchange(
 //                FollowController.API_URL + "/users/" + username + "/id",
                 "http://localhost:8080/api/articles/" + slug + "/id",
@@ -37,9 +37,9 @@ public class FavoriteService {
         return response.getBody();
     }
 
-    private WrapArticleResponse getArticleResponseFromRestTemplate(final String slug,
+    private WrapArticleResponse getArticleResponseWithRestTemplate(final String slug,
                                                                    final String token) {
-        log.info("getArticleResponseFromRestTemplate() : slug={}", slug);
+        log.info("getArticleResponseWithRestTemplate() : slug={}", slug);
 
         HttpHeaders headers = new HttpHeaders();
         if (StringUtils.hasText(token))
@@ -58,18 +58,18 @@ public class FavoriteService {
         log.info("favorite() : loginUserId={}", loginUserId);
         log.info("favorite() : token={}", token);
 
-        final var articleId = getArticleIdFromRestTemplate(slug);
+        final var articleId = getArticleIdBySlugWithRestTemplate(slug);
         favoriteRepository.save(Favorite.of(articleId, loginUserId));
-        return getArticleResponseFromRestTemplate(slug, token);
+        return getArticleResponseWithRestTemplate(slug, token);
     }
 
     public WrapArticleResponse unfavorite(final String slug, final long loginUserId, final String token) {
         log.info("unfavorite() : loginUserId={}", loginUserId);
         log.info("unfavorite() : token={}", token);
 
-        final var articleId = getArticleIdFromRestTemplate(slug);
+        final var articleId = getArticleIdBySlugWithRestTemplate(slug);
         favoriteRepository.deleteById(new FavoriteId(articleId, loginUserId));
-        return getArticleResponseFromRestTemplate(slug, token);
+        return getArticleResponseWithRestTemplate(slug, token);
     }
 
     public Long[] favoriteInfo(final Long articleId, final long loginUserId) {

@@ -1,35 +1,70 @@
 package com.lodny.rwcomment.service;
 
 import com.lodny.rwcomment.entity.Comment;
-import com.lodny.rwcomment.entity.dto.*;
+import com.lodny.rwcomment.entity.dto.CommentResponse;
+import com.lodny.rwcomment.entity.dto.ProfileResponse;
+import com.lodny.rwcomment.entity.dto.RegisterCommentRequest;
 import com.lodny.rwcomment.repository.CommentRepository;
+import com.lodny.rwcommon.properties.JwtProperty;
+import com.lodny.rwcommon.util.LoginInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
+    private final RestTemplate restTemplate;
+    private final JwtProperty jwtProperty;
 
-    /*public CommentResponse registerComment(final String slug,
+    private Long getArticleIdBySlugWithRestTemplate(final String slug) {  //}, final String token) {
+        ResponseEntity<Long> response = restTemplate.exchange(
+                "http://localhost:8080/api/articles/" + slug + "/id",
+                HttpMethod.GET,
+                new HttpEntity<>(new HttpHeaders()),
+                Long.class);
+
+        return response.getBody();
+    }
+
+    private ProfileResponse getProfileResponseByUserIdWithRestTemplate(final Long userId) {
+        ResponseEntity<ProfileResponse> response = restTemplate.exchange(
+                "http://localhost:8080/api/profiles/by-id/" + userId,
+                HttpMethod.GET,
+                new HttpEntity<String>(new HttpHeaders()),
+                ProfileResponse.class);
+
+        return response.getBody();
+    }
+
+    public CommentResponse registerComment(final String slug,
                                            final RegisterCommentRequest registerCommentRequest,
-                                           final UserResponse loginUser) {
-        Article foundArticle = articleRepository.findBySlug(slug)
-                .orElseThrow(() -> new IllegalArgumentException("article not found"));
-        log.info("registerComment() : foundArticle={}", foundArticle);
+                                           final LoginInfo loginUser) {
+        final Long articleId = getArticleIdBySlugWithRestTemplate(slug);
+        log.info("registerComment() : articleId={}", articleId);
 
-        Comment comment = Comment.of(registerCommentRequest, foundArticle.getId(), loginUser.id());
+        Comment comment = Comment.of(registerCommentRequest, articleId, loginUser.getUserId());
         log.info("registerComment() : comment={}", comment);
         Comment savedComment = commentRepository.save(comment);
         log.info("registerComment() : savedComment={}", savedComment);
 
-        return CommentResponse.of(savedComment, ProfileResponse.of(loginUser.user(), false));
+        ProfileResponse profileResponse = getProfileResponseByUserIdWithRestTemplate(loginUser.getUserId());
+        log.info("registerComment() : profileResponse={}", profileResponse);
+
+        return CommentResponse.of(savedComment, profileResponse);
     }
 
+
+
+
+    /*
     public int deleteComment(final String slug, final Long commentId, final Long loginUserId) {
         log.info("deleteComment() : loginUserId={}", loginUserId);
 
